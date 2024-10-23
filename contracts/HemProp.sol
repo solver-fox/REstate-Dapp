@@ -153,16 +153,16 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     Properties = new PropertyStruct[](availableProperties);
     uint256 index;
 
-    for (uint i = 1; i < _totalProperties.current(); i++) {
+    for (uint256 i = 1; i <= _totalProperties.current(); i++) {
       if (!properties[i].deleted && properties[i].owner == msg.sender) {
         Properties[index++] = properties[i];
       }
     }
   }
 
-  function buyProperty(uint256 id) public payable {
-    require(propertyExist[id], 'Property does not exisit');
-    require(msg.value > 0, 'price must be greater than Zero');
+  function buyProperty(uint256 id) public payable nonReentrant {
+    require(propertyExist[id], 'Property does not exist');
+    require(msg.value >= properties[id].price, 'Insufficient payment');
     require(!properties[id].deleted, 'Property has been deleted');
     require(!properties[id].sold, 'Property has been sold');
 
@@ -175,13 +175,14 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     sales[id].push(sale);
 
     uint256 fee = (msg.value * servicePct) / 100;
-    uint256 payment = (msg.value - fee);
+    uint256 payment = msg.value - fee;
 
     payTo(properties[id].owner, payment);
-    payTo(0xcF34f424bBFA9105288268504981f9fF6A088C8b, fee);
-    // payTo(owner(), fee);
+    payTo(owner(), fee);
 
     properties[id].sold = true;
+    properties[id].owner = msg.sender;
+    _transfer(properties[id].owner, msg.sender, id);
   }
 
   function payTo(address to, uint256 price) internal {
@@ -206,27 +207,39 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     reviewExist[review.id] = true;
   }
 
-  function updateReview(uint256 id, string memory comment) public {
-    require(reviewExist[id], 'Review does not exist');
-    require(msg.sender == reviews[id][0].reviewer, 'Only the reviwer can edit review');
-    require(bytes(comment).length > 0, 'Comment can not be empty');
+function updateReview(uint256 propertyId, uint256 reviewId, string memory comment) public {
+    require(propertyExist[propertyId], "Property does not exist");
+    require(reviewExist[reviewId], "Review does not exist");
+    require(bytes(comment).length > 0, "Comment cannot be empty");
 
-    reviews[id][0].comment = comment;
-  }
+    
+    for (uint256 i = 0; i < reviews[propertyId].length; i++) {
+        if (reviews[propertyId][i].id == reviewId) {
+            require(msg.sender == reviews[propertyId][i].reviewer, "Only the reviewer can edit the review");
 
-  function deleteReview(uint256 id) public {
-    require(reviewExist[id], 'Review does not exist');
-    require(msg.sender == reviews[id][0].reviewer, 'Only the reviewer can delete review');
+            reviews[propertyId][i].comment = comment;
+            return;
+        }
+    }
 
-    delete reviews[id];
-    reviewExist[id] = false;
-  }
+    revert("Review not found");
+}
 
-  function getReviews(uint256 id) public view returns (ReviewStruct[] memory) {
-    return reviews[id];
-  }
+function deleteReview(uint256 propertyId, uint256 reviewId) public {
+    require(propertyExist[propertyId], "Property does not exist");
+    require(reviewExist[reviewId], "Review does not exist");
 
-  function getSales(uint256 id) public view returns (SaleStruct[] memory Sales) {
-    return sales[id];
-  }
+    
+    for (uint256 i = 0; i < reviews[propertyId].length; i++) {
+        if (reviews[propertyId][i].id == reviewId) {
+            require(msg.sender == reviews[propertyId][i].reviewer || msg.sender == owner(), "Only the reviewer or contract owner can delete the review");
+
+            reviews[propertyId][i].deleted = true;
+            return;
+        }
+    }
+
+    revert("Review not found");
+}
+
 }
