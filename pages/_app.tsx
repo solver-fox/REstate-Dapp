@@ -9,6 +9,7 @@ import Header from '@/components/Header'
 import { Provider } from 'react-redux'
 import { store } from '@/store'
 
+
 export default function App({ Component, pageProps }: AppProps) {
   const [showChild, setShowChild] = useState<boolean>(false)
 
