@@ -5,52 +5,35 @@ export interface TruncateParams {
   maxLength: number
 }
 
-export interface EventParams {
+// Property Parameters
+export interface PropertyParams {
   id?: number
-  title: string
-  imageUrl: string
+  name: string
+  image: string
+  category: string
   description: string
-  ticketCost: number | string
-  capacity: number | string
-  startsAt: number | string
-  endsAt: number | string
+  location: string
+  bedroom: number
+  bathroom: number
+  built: number
+  squarefit: number
+  price: number
 }
 
-export interface EventStruct {
+//Property Structure
+export interface PropertyStruct {
   id: number
-  title: string
-  imageUrl: string
+  owner: number
+  name: string
+  image: string
+  category: string
   description: string
-  owner: string
-  sales: number
-  ticketCost: number
-  capacity: number
-  seats: number
-  startsAt: number
-  endsAt: number
-  timestamp: number
+  location: string
+  bedroom: number
+  bathroom: number
+  built: number
+  squarefit: number
+  price: number
+  sold: boolean
   deleted: boolean
-  paidOut: boolean
-  refunded: boolean
-  minted: boolean
-}
-
-export interface TicketStruct {
-  id: number
-  eventId: number
-  owner: string
-  ticketCost: number
-  timestamp: number
-  refunded: boolean
-  minted: boolean
-}
-
-export interface GlobalState {
-  event: EventStruct | null
-  tickets: TicketStruct[]
-  ticketModal: string
-}
-
-export interface RootState {
-  globalStates: GlobalState
 }

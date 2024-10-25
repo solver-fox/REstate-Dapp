@@ -24,6 +24,10 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     string category;
     string description;
     string location;
+    uint256 bedroom;
+    uint256 bathroom;
+    uint256 built;
+    uint256 squarefit;
     uint256 price;
     bool sold;
     bool deleted;
@@ -57,13 +61,21 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     string memory category,
     string memory description,
     string memory location,
+    uint256 bedroom,
+    uint256 bathroom,
+    uint256 built,
+    uint256 squarefit,
     uint256 price
   ) public {
     require(bytes(name).length > 0, 'Name cannot be empty');
     require(bytes(image).length > 0, 'Image cannot be empty');
     require(bytes(category).length > 0, 'Category cannot be empty');
-    require(bytes(location).length > 0, 'Location cannot be empty');
     require(bytes(description).length > 0, 'Description cannot be empty');
+    require(bytes(location).length > 0, 'Location cannot be empty');
+    require(bedroom > 0, 'Bedroom cannot be zero or empty');
+    require(bathroom > 0, 'Bathroom cannot be zero or empty');
+    require(built > 0, 'Year built cannot be zero or empty');
+    require(squarefit > 0, 'House size cannot be zero or empty');
     require(price > 0, 'Price must be greater than zero');
 
     _totalProperties.increment();
@@ -76,6 +88,10 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     property.category = category;
     property.description = description;
     property.location = location;
+    property.bedroom = bedroom;
+    property.bathroom = bathroom;
+    property.built = built;
+    property.squarefit = squarefit;
     property.price = price;
 
     properties[property.id] = property;
@@ -89,6 +105,10 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     string memory category,
     string memory description,
     string memory location,
+    uint256 bedroom,
+    uint256 bathroom,
+    uint256 built,
+    uint256 squarefit,
     uint256 price
   ) public {
     require(propertyExist[id], 'Property does not exist');
@@ -98,6 +118,10 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     require(bytes(category).length > 0, 'Category cannot be empty');
     require(bytes(location).length > 0, 'Location cannot be empty');
     require(bytes(description).length > 0, 'Description cannot be empty');
+    require(bedroom > 0, 'Bedroom cannot be zero or empty');
+    require(bathroom > 0, 'Bathroom cannot be zero or empty');
+    require(built > 0, 'Year built cannot be zero or empty');
+    require(squarefit > 0, 'House size cannot be zero or empty');
     require(price > 0, 'Price must be greater than zero');
 
     properties[id].name = name;
@@ -105,6 +129,10 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     properties[id].image = image;
     properties[id].description = description;
     properties[id].location = location;
+    properties[id].bedroom = bedroom;
+    properties[id].bathroom = bathroom;
+    properties[id].built = built;
+    properties[id].squarefit = squarefit;
     properties[id].price = price;
   }
 
@@ -120,7 +148,7 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
 
   function getProperty(uint256 id) public view returns (PropertyStruct memory) {
     require(propertyExist[id], 'Property does not exist');
-    require(!properties[id].deleted, 'Propery has been deleted');
+    require(!properties[id].deleted, 'Property has been deleted');
 
     return properties[id];
   }
@@ -142,7 +170,7 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     }
   }
 
-  function getMyProperty() public view returns (PropertyStruct[] memory Properties) {
+  function getMyProperties() public view returns (PropertyStruct[] memory Properties) {
     uint256 availableProperties;
     for (uint256 i = 1; i <= _totalProperties.current(); i++) {
       if (!properties[i].deleted && properties[i].owner == msg.sender) {
@@ -207,39 +235,21 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     reviewExist[review.id] = true;
   }
 
-function updateReview(uint256 propertyId, uint256 reviewId, string memory comment) public {
-    require(propertyExist[propertyId], "Property does not exist");
-    require(reviewExist[reviewId], "Review does not exist");
-    require(bytes(comment).length > 0, "Comment cannot be empty");
+  function updateReview(uint256 id, string memory comment) public {
+    require(propertyExist[id], 'Property does not exist');
+    require(reviewExist[id], 'Review does not exist');
 
-    
-    for (uint256 i = 0; i < reviews[propertyId].length; i++) {
-        if (reviews[propertyId][i].id == reviewId) {
-            require(msg.sender == reviews[propertyId][i].reviewer, "Only the reviewer can edit the review");
+    reviews[id][0].comment = comment;
+  }
 
-            reviews[propertyId][i].comment = comment;
-            return;
-        }
-    }
+  function deleteReview(uint256 id) public {
+    require(propertyExist[id], 'Property does not exist');
+    require(reviewExist[id], 'Property does not exist');
 
-    revert("Review not found");
-}
+    reviews[id][0].deleted = true;
+  }
 
-function deleteReview(uint256 propertyId, uint256 reviewId) public {
-    require(propertyExist[propertyId], "Property does not exist");
-    require(reviewExist[reviewId], "Review does not exist");
-
-    
-    for (uint256 i = 0; i < reviews[propertyId].length; i++) {
-        if (reviews[propertyId][i].id == reviewId) {
-            require(msg.sender == reviews[propertyId][i].reviewer || msg.sender == owner(), "Only the reviewer or contract owner can delete the review");
-
-            reviews[propertyId][i].deleted = true;
-            return;
-        }
-    }
-
-    revert("Review not found");
-}
-
+  function getReviews(uint256 id) public view returns (ReviewStruct[] memory) {
+    return reviews[id];
+  }
 }
