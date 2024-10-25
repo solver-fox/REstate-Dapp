@@ -43,10 +43,14 @@ const createProperty = async (property: PropertyParams): Promise<void> => {
     const contract = await getEthereumContract()
     tx = await contract.createProperty(
       property.name,
-      property.image,
+      property.images,
       property.category,
       property.description,
       property.location,
+      property.city,
+      property.state,
+      property.country,
+      property.zipCode,
       property.bedroom,
       property.bathroom,
       property.built,
@@ -71,10 +75,14 @@ const updateProperty = async (property: PropertyParams): Promise<void> => {
     tx = await contract.updateProperty(
       property.id,
       property.name,
-      property.image,
+      property.images,
       property.category,
       property.description,
       property.location,
+      property.city,
+      property.state,
+      property.country,
+      property.zipCode,
       property.bedroom,
       property.bathroom,
       property.built,
@@ -161,9 +169,9 @@ const buyProperty = async (property: PropertyStruct): Promise<void> => {
   }
   try {
     const contract = await getEthereumContract()
-    tx = await contract.buyProperty(property.id)
-
+    tx = await contract.buyProperty(property.id, { value: toWei(property.price) })
     await tx.wait()
+
     return Promise.resolve(tx)
   } catch (error) {
     reportError(error)
@@ -222,15 +230,19 @@ const propertyStructure = (properties: PropertyStruct[]): PropertyStruct[] =>
     id: Number(property.id),
     owner: property.owner,
     name: property.name,
-    image: property.image,
+    images: property.images,
     category: property.category,
     description: property.description,
     location: property.location,
+    city: property.city,
+    state: property.state,
+    country: property.country,
+    zipCode: property.zipCode,
     bedroom: Number(property.bedroom),
     bathroom: Number(property.bathroom),
     built: Number(property.built),
     squarefit: Number(property.squarefit),
-    price: property.price,
+    price: parseFloat(fromWei(property.price)),
     sold: property.sold,
     deleted: property.deleted,
   }))

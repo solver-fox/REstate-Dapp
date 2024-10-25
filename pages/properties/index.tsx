@@ -2,11 +2,7 @@ import Hero from '@/components/Hero'
 import React from 'react'
 
 const index = () => {
-  return (
-    <div>
-      <Hero />
-    </div>
-  )
+  return <div>index</div>
 }
 
 export default index

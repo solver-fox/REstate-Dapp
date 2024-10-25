@@ -45,12 +45,12 @@ const wagmiConfig = createConfig({
 })
 
 const demoAppInfo = {
-  appName: 'Dapp Funds dApp',
+  appName: 'Real Estate dApp',
 }
 
 const getSiweMessageOptions: GetSiweMessageOptions = () => ({
   statement: `
-  Once you're signed in, you'll be able to access all of our dApp's features.
+  Once you're signed in, you'll be able to access all of our real estate dApp's features.
   Thank you for partnering with CrowdFunding!`,
 })
 

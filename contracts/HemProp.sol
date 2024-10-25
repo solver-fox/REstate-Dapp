@@ -10,7 +10,12 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
   event PropertyCreated(uint256 indexed id, address indexed owner, uint256 price);
   event PropertyUpdated(uint256 indexed id);
   event PropertyDeleted(uint256 indexed id);
-  event PropertySold(uint256 indexed id, address indexed oldOwner, address indexed newOwner, uint256 price);
+  event PropertySold(
+    uint256 indexed id,
+    address indexed oldOwner,
+    address indexed newOwner,
+    uint256 price
+  );
   event ReviewCreated(uint256 indexed propertyId, uint256 indexed reviewId);
   event ReviewUpdated(uint256 indexed propertyId, uint256 indexed reviewId);
   event ReviewDeleted(uint256 indexed propertyId, uint256 indexed reviewId);
@@ -32,6 +37,10 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     string category;
     string description;
     string location;
+    string city;
+    string state;
+    string country;
+    uint256 zipCode;
     uint256 bedroom;
     uint256 bathroom;
     uint256 built;
@@ -72,6 +81,10 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     string memory category,
     string memory description,
     string memory location,
+    string memory city,
+    string memory state,
+    string memory country,
+    uint256 zipCode,
     uint256 bedroom,
     uint256 bathroom,
     uint256 built,
@@ -84,6 +97,10 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     require(bytes(category).length > 0, 'Category cannot be empty');
     require(bytes(description).length > 0, 'Description cannot be empty');
     require(bytes(location).length > 0, 'Location cannot be empty');
+    require(bytes(city).length > 0, 'City cannot be empty');
+    require(bytes(state).length > 0, 'State cannot be empty');
+    require(bytes(country).length > 0, 'Country cannot be empty');
+    require(zipCode > 0, 'Zip Code cannot be empty');
     require(bedroom > 0, 'Bedroom cannot be zero or empty');
     require(bathroom > 0, 'Bathroom cannot be zero or empty');
     require(built > 0, 'Year built cannot be zero or empty');
@@ -105,6 +122,10 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     property.category = category;
     property.description = description;
     property.location = location;
+    property.city = city;
+    property.state = state;
+    property.country =  country;
+    property.zipCode = zipCode;
     property.bedroom = bedroom;
     property.bathroom = bathroom;
     property.built = built;
@@ -127,6 +148,10 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     string memory category,
     string memory description,
     string memory location,
+    string memory city,
+    string memory state,
+    string memory country,
+    uint256 zipCode,
     uint256 bedroom,
     uint256 bathroom,
     uint256 built,
@@ -140,6 +165,10 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     require(images.length <= 10, 'Maximum 10 images allowed');
     require(bytes(category).length > 0, 'Category cannot be empty');
     require(bytes(location).length > 0, 'Location cannot be empty');
+    require(bytes(city).length > 0, 'City cannot be empty');
+    require(bytes(state).length > 0, 'State cannot be empty');
+    require(bytes(country).length > 0, 'Country cannot be empty');
+    require(zipCode > 0, 'Zip Code cannot be empty');
     require(bytes(description).length > 0, 'Description cannot be empty');
     require(bedroom > 0, 'Bedroom cannot be zero or empty');
     require(bathroom > 0, 'Bathroom cannot be zero or empty');
@@ -157,6 +186,10 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     properties[id].category = category;
     properties[id].description = description;
     properties[id].location = location;
+    properties[id].city = city;
+    properties[id].state = state;
+    properties[id].country = country;
+    properties[id].zipCode = zipCode;
     properties[id].bedroom = bedroom;
     properties[id].bathroom = bathroom;
     properties[id].built = built;
@@ -242,11 +275,13 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     payTo(properties[id].owner, payment);
     payTo(owner(), fee);
 
+    address oldOwner = properties[id].owner;
+    
     properties[id].sold = true;
     properties[id].owner = msg.sender;
-    _transfer(properties[id].owner, msg.sender, id);
+    _transfer(oldOwner, msg.sender, id);
 
-    emit PropertySold(id, properties[id].owner, msg.sender, properties[id].price);
+    emit PropertySold(id, oldOwner, msg.sender, properties[id].price);
   }
 
   function payTo(address to, uint256 price) internal {
@@ -360,7 +395,10 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     return myReviews;
   }
 
-  function getReview(uint256 propertyId, uint256 reviewId) public view returns (ReviewStruct memory) {
+  function getReview(
+    uint256 propertyId,
+    uint256 reviewId
+  ) public view returns (ReviewStruct memory) {
     require(propertyExist[propertyId], 'Property does not exist');
     require(reviewExist[reviewId], 'Review does not exist');
 

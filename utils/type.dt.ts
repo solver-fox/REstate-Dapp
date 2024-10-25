@@ -9,10 +9,14 @@ export interface TruncateParams {
 export interface PropertyParams {
   id?: number
   name: string
-  image: string[]
+  images: string[]
   category: string
   description: string
   location: string
+  city: string
+  state: string
+  country: string
+  zipCode: number
   bedroom: number
   bathroom: number
   built: number
@@ -25,10 +29,14 @@ export interface PropertyStruct {
   id: number
   owner: string
   name: string
-  image: string[]
+  images: string[]
   category: string
   description: string
   location: string
+  city: string
+  state: string
+  country: string
+  zipCode: number
   bedroom: number
   bathroom: number
   built: number
