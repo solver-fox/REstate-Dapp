@@ -37,7 +37,7 @@ const Hero = () => {
               </Link>
               <Link
                 href={'/properties/list'}
-                className="px-8 py-4 bg-gray-800/50 backdrop-blur-sm text-white font-semibold rounded-md hover:bg-gray-700 hover:scale-105 transition-all duration-200 active:scale-95 text-center"
+                className="px-8 py-4 bg-gray-800/50 backdrop-blur-sm text-white font-semibold rounded-md hover:bg-gray-700 hover:scale-105 transition-all duration-200 active:scale-95 text-center border border-white/40"
               >
                 List Property
               </Link>
@@ -80,7 +80,7 @@ const Hero = () => {
               <div className="flex justify-between items-center border-t border-gray-800/50 pt-4">
                 <div className="space-y-1">
                   <p className="text-gray-400 text-sm">Current Value</p>
-                  <p className="text-2xl font-bold text-white">125 ETH</p>
+                  <p className="text-2xl font-bold text-white">25 ETH</p>
                 </div>
                 <button className="px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors">
                   View Details
