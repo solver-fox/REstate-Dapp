@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
 import address from '@/contracts/contractAddress.json'
 import abi from '@/artifacts/contracts/HemProp.sol/HemProp.json'
-import { PropertyParams, PropertyStruct } from '@/utils/type.dt'
+import { PropertyParams, PropertyStruct, ReviewParam, ReviewStruct } from '@/utils/type.dt'
 
 const toWei = (num: number) => ethers.parseEther(num.toString())
 const fromWei = (num: string | number | null): string => {
@@ -105,6 +105,22 @@ const deleteProperty = async (id: number): Promise<void> => {
   }
 }
 
+const createReview = async (review: ReviewParam): Promise<void> => {
+  if (!ethereum) {
+    reportError('Please install a wallet provider')
+    return Promise.reject(new Error('Browser provider not found'))
+  }
+  try {
+    const contract = await getEthereumContract()
+    tx = await contract.createReview(review.comment, review.timestamp)
+    await tx.wait()
+    return Promise.resolve(tx)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
+  }
+}
+
 const buyProperty = async (property: PropertyStruct): Promise<void> => {
   if (!ethereum) {
     reportError('Please install a wallet provider')
@@ -166,4 +182,5 @@ export {
   getProperty,
   getAllProperties,
   getMyProperties,
+  createReview,
 }

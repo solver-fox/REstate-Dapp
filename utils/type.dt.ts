@@ -37,3 +37,23 @@ export interface PropertyStruct {
   sold: boolean
   deleted: boolean
 }
+
+//Create Review Param
+export interface ReviewParam {
+  id?: number
+  propertyId: number
+  comment: string
+  reviewer: number
+  deleted: boolean
+  timestamp: number
+}
+
+//Review Structure
+export interface ReviewStruct {
+  id: number
+  propertyId: number
+  comment: string
+  reviewer: number
+  deleted: boolean
+  timestamp: number
+}

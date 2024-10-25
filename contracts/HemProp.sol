@@ -20,7 +20,7 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     uint256 id;
     address owner;
     string name;
-    string image;
+    string[] images;
     string category;
     string description;
     string location;
@@ -39,7 +39,7 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     string comment;
     address reviewer;
     bool deleted;
-    uint256 timestamp; // Added timestamp for review tracking
+    uint256 timestamp;
   }
 
   struct SaleStruct {
@@ -53,15 +53,14 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
   mapping(uint256 => SaleStruct[]) sales;
   mapping(uint256 => bool) propertyExist;
   mapping(uint256 => bool) reviewExist;
-  mapping(uint256 => mapping(uint256 => uint256)) private reviewIndexInProperty; // propertyId => reviewId => index
+  mapping(uint256 => mapping(uint256 => uint256)) private reviewIndexInProperty;
 
   uint256 private servicePct;
 
   // Property Management Functions
-
   function createProperty(
     string memory name,
-    string memory image,
+    string[] memory images,
     string memory category,
     string memory description,
     string memory location,
@@ -72,7 +71,8 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     uint256 price
   ) public {
     require(bytes(name).length > 0, 'Name cannot be empty');
-    require(bytes(image).length > 0, 'Image cannot be empty');
+    require(images.length > 0, 'At least one image is required');
+    require(images.length <= 10, 'Maximum 10 images allowed');
     require(bytes(category).length > 0, 'Category cannot be empty');
     require(bytes(description).length > 0, 'Description cannot be empty');
     require(bytes(location).length > 0, 'Location cannot be empty');
@@ -82,13 +82,18 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     require(squarefit > 0, 'House size cannot be zero or empty');
     require(price > 0, 'Price must be greater than zero');
 
+    // Validate each image URL
+    for(uint i = 0; i < images.length; i++) {
+        require(bytes(images[i]).length > 0, 'Image URL cannot be empty');
+    }
+
     _totalProperties.increment();
     PropertyStruct memory property;
 
     property.id = _totalProperties.current();
     property.owner = msg.sender;
     property.name = name;
-    property.image = image;
+    property.images = images;
     property.category = category;
     property.description = description;
     property.location = location;
@@ -108,7 +113,7 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
   function updateProperty(
     uint256 id,
     string memory name,
-    string memory image,
+    string[] memory images,
     string memory category,
     string memory description,
     string memory location,
@@ -119,9 +124,10 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     uint256 price
   ) public {
     require(propertyExist[id], 'Property does not exist');
-    require(msg.sender == properties[id].owner, 'Only the property owner can edit this event');
+    require(msg.sender == properties[id].owner, 'Only the property owner can edit this property');
     require(bytes(name).length > 0, 'Name cannot be empty');
-    require(bytes(image).length > 0, 'Image cannot be empty');
+    require(images.length > 0, 'At least one image is required');
+    require(images.length <= 10, 'Maximum 10 images allowed');
     require(bytes(category).length > 0, 'Category cannot be empty');
     require(bytes(location).length > 0, 'Location cannot be empty');
     require(bytes(description).length > 0, 'Description cannot be empty');
@@ -131,9 +137,14 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     require(squarefit > 0, 'House size cannot be zero or empty');
     require(price > 0, 'Price must be greater than zero');
 
+    // Validate each image URL
+    for(uint i = 0; i < images.length; i++) {
+        require(bytes(images[i]).length > 0, 'Image URL cannot be empty');
+    }
+
     properties[id].name = name;
+    properties[id].images = images;
     properties[id].category = category;
-    properties[id].image = image;
     properties[id].description = description;
     properties[id].location = location;
     properties[id].bedroom = bedroom;
@@ -154,7 +165,6 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
   }
 
   // Property View Functions
-
   function getProperty(uint256 id) public view returns (PropertyStruct memory) {
     require(propertyExist[id], 'Property does not exist');
     require(!properties[id].deleted, 'Property has been deleted');
@@ -198,7 +208,6 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
   }
 
   // Property Purchase Function
-
   function buyProperty(uint256 id) public payable nonReentrant {
     require(propertyExist[id], 'Property does not exist');
     require(msg.value >= properties[id].price, 'Insufficient payment');
@@ -230,7 +239,6 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
   }
 
   // Review Management Functions
-
   function createReview(uint256 propertyId, string memory comment) public {
     require(propertyExist[propertyId], 'Property does not exist');
     require(!properties[propertyId].deleted, 'Property has been deleted');
@@ -248,7 +256,6 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     review.deleted = false;
     review.timestamp = block.timestamp;
 
-    // Store the review index for easy access later
     reviewIndexInProperty[propertyId][reviewId] = reviews[propertyId].length;
     reviews[propertyId].push(review);
     reviewExist[reviewId] = true;
@@ -286,11 +293,9 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
   }
 
   // Review View Functions
-
   function getReviews(uint256 propertyId) public view returns (ReviewStruct[] memory) {
     require(propertyExist[propertyId], 'Property does not exist');
 
-    // Count active reviews
     uint256 activeCount = 0;
     for (uint256 i = 0; i < reviews[propertyId].length; i++) {
       if (!reviews[propertyId][i].deleted) {
@@ -298,7 +303,6 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
       }
     }
 
-    // Create array of active reviews
     ReviewStruct[] memory activeReviews = new ReviewStruct[](activeCount);
     uint256 index = 0;
 
