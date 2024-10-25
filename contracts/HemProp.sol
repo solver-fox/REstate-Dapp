@@ -7,6 +7,14 @@ import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
 
 contract HemProp is Ownable, ERC721, ReentrancyGuard {
+  event PropertyCreated(uint256 indexed id, address indexed owner, uint256 price);
+  event PropertyUpdated(uint256 indexed id);
+  event PropertyDeleted(uint256 indexed id);
+  event PropertySold(uint256 indexed id, address indexed oldOwner, address indexed newOwner, uint256 price);
+  event ReviewCreated(uint256 indexed propertyId, uint256 indexed reviewId);
+  event ReviewUpdated(uint256 indexed propertyId, uint256 indexed reviewId);
+  event ReviewDeleted(uint256 indexed propertyId, uint256 indexed reviewId);
+
   constructor(uint256 _pct) ERC721('HemProperty', 'Hpt') {
     servicePct = _pct;
   }
@@ -83,8 +91,8 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     require(price > 0, 'Price must be greater than zero');
 
     // Validate each image URL
-    for(uint i = 0; i < images.length; i++) {
-        require(bytes(images[i]).length > 0, 'Image URL cannot be empty');
+    for (uint i = 0; i < images.length; i++) {
+      require(bytes(images[i]).length > 0, 'Image URL cannot be empty');
     }
 
     _totalProperties.increment();
@@ -108,6 +116,8 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
 
     properties[property.id] = property;
     propertyExist[property.id] = true;
+
+    emit PropertyCreated(property.id, property.owner, property.price);
   }
 
   function updateProperty(
@@ -138,8 +148,8 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     require(price > 0, 'Price must be greater than zero');
 
     // Validate each image URL
-    for(uint i = 0; i < images.length; i++) {
-        require(bytes(images[i]).length > 0, 'Image URL cannot be empty');
+    for (uint i = 0; i < images.length; i++) {
+      require(bytes(images[i]).length > 0, 'Image URL cannot be empty');
     }
 
     properties[id].name = name;
@@ -152,6 +162,8 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     properties[id].built = built;
     properties[id].squarefit = squarefit;
     properties[id].price = price;
+
+    emit PropertyUpdated(id);
   }
 
   function deleteProperty(uint256 id) public {
@@ -162,6 +174,8 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     );
 
     properties[id].deleted = true;
+
+    emit PropertyDeleted(id);
   }
 
   // Property View Functions
@@ -172,7 +186,7 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     return properties[id];
   }
 
-  function getAllProperties() public view returns (PropertyStruct[] memory Properties) {
+  function getAllProperties() public view returns (PropertyStruct[] memory myProperties) {
     uint256 availableProperties;
     for (uint256 i = 1; i <= _totalProperties.current(); i++) {
       if (!properties[i].deleted) {
@@ -180,16 +194,16 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
       }
     }
 
-    Properties = new PropertyStruct[](availableProperties);
+    myProperties = new PropertyStruct[](availableProperties);
     uint256 index;
     for (uint256 i = 1; i <= _totalProperties.current(); i++) {
       if (!properties[i].deleted) {
-        Properties[index++] = properties[i];
+        myProperties[index++] = properties[i];
       }
     }
   }
 
-  function getMyProperties() public view returns (PropertyStruct[] memory Properties) {
+  function getMyProperties() public view returns (PropertyStruct[] memory myProperties) {
     uint256 availableProperties;
     for (uint256 i = 1; i <= _totalProperties.current(); i++) {
       if (!properties[i].deleted && properties[i].owner == msg.sender) {
@@ -197,12 +211,12 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
       }
     }
 
-    Properties = new PropertyStruct[](availableProperties);
+    myProperties = new PropertyStruct[](availableProperties);
     uint256 index;
 
     for (uint256 i = 1; i <= _totalProperties.current(); i++) {
       if (!properties[i].deleted && properties[i].owner == msg.sender) {
-        Properties[index++] = properties[i];
+        myProperties[index++] = properties[i];
       }
     }
   }
@@ -231,6 +245,8 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     properties[id].sold = true;
     properties[id].owner = msg.sender;
     _transfer(properties[id].owner, msg.sender, id);
+
+    emit PropertySold(id, properties[id].owner, msg.sender, properties[id].price);
   }
 
   function payTo(address to, uint256 price) internal {
@@ -259,6 +275,8 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     reviewIndexInProperty[propertyId][reviewId] = reviews[propertyId].length;
     reviews[propertyId].push(review);
     reviewExist[reviewId] = true;
+
+    emit ReviewCreated(propertyId, reviewId);
   }
 
   function updateReview(uint256 propertyId, uint256 reviewId, string memory comment) public {
@@ -275,6 +293,8 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
 
     reviews[propertyId][reviewIndex].comment = comment;
     reviews[propertyId][reviewIndex].timestamp = block.timestamp;
+
+    emit ReviewUpdated(propertyId, reviewId);
   }
 
   function deleteReview(uint256 propertyId, uint256 reviewId) public {
@@ -290,6 +310,8 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     require(!reviews[propertyId][reviewIndex].deleted, 'Review already deleted');
 
     reviews[propertyId][reviewIndex].deleted = true;
+
+    emit ReviewDeleted(propertyId, reviewId);
   }
 
   // Review View Functions
@@ -316,7 +338,7 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     return activeReviews;
   }
 
-  function getMyReviewsForProperty(uint256 propertyId) public view returns (ReviewStruct[] memory) {
+  function getMyReviews(uint256 propertyId) public view returns (ReviewStruct[] memory) {
     require(propertyExist[propertyId], 'Property does not exist');
 
     uint256 myReviewCount = 0;
@@ -335,7 +357,17 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
         index++;
       }
     }
-
     return myReviews;
+  }
+
+  function getReview(uint256 propertyId, uint256 reviewId) public view returns (ReviewStruct memory) {
+    require(propertyExist[propertyId], 'Property does not exist');
+    require(reviewExist[reviewId], 'Review does not exist');
+
+    uint256 reviewIndex = reviewIndexInProperty[propertyId][reviewId];
+    require(reviewIndex < reviews[propertyId].length, 'Review not found for this property');
+    require(!reviews[propertyId][reviewIndex].deleted, 'Review has been deleted');
+
+    return reviews[propertyId][reviewIndex];
   }
 }

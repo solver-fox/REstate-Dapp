@@ -1,7 +1,7 @@
-import { ethers } from 'ethers'
+import { ethers, id } from 'ethers'
 import address from '@/contracts/contractAddress.json'
 import abi from '@/artifacts/contracts/HemProp.sol/HemProp.json'
-import { PropertyParams, PropertyStruct, ReviewParam, ReviewStruct } from '@/utils/type.dt'
+import { PropertyParams, PropertyStruct, ReviewParams, ReviewStruct } from '@/utils/type.dt'
 
 const toWei = (num: number) => ethers.parseEther(num.toString())
 const fromWei = (num: string | number | null): string => {
@@ -105,14 +105,47 @@ const deleteProperty = async (id: number): Promise<void> => {
   }
 }
 
-const createReview = async (review: ReviewParam): Promise<void> => {
+const createReview = async (review: ReviewParams): Promise<void> => {
   if (!ethereum) {
     reportError('Please install a wallet provider')
     return Promise.reject(new Error('Browser provider not found'))
   }
   try {
     const contract = await getEthereumContract()
-    tx = await contract.createReview(review.comment, review.timestamp)
+    tx = await contract.createReview(review.propertyId, review.comment)
+    await tx.wait()
+    return Promise.resolve(tx)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
+  }
+}
+
+const updateReview = async (review: ReviewParams): Promise<void> => {
+  if (!ethereum) {
+    reportError('Please install a wallet provider')
+    return Promise.reject(new Error('Browser provider not found'))
+  }
+  try {
+    const contract = await getEthereumContract()
+    tx = await contract.updateReview(review.propertyId, review.id, review.comment)
+
+    await tx.wait()
+    return Promise.resolve(tx)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
+  }
+}
+
+const deleteReview = async (reviewId: number, propertyId: number): Promise<void> => {
+  if (!ethereum) {
+    reportError('Please install a wallet provider')
+    return Promise.reject(new Error('Browser provider not found'))
+  }
+  try {
+    const contract = await getEthereumContract()
+    tx = await contract.deleteReview(propertyId, reviewId)
     await tx.wait()
     return Promise.resolve(tx)
   } catch (error) {
@@ -156,6 +189,34 @@ const getMyProperties = async (): Promise<PropertyStruct[]> => {
   return propertyStructure(properties)
 }
 
+const getAllReviews = async (propertyId: number): Promise<ReviewStruct[]> => {
+  const contract = await getEthereumContract()
+  const reviews = await contract.getReviews(propertyId)
+  return reviewStructure(reviews)
+}
+
+const getMyReviews = async (propertyId: number): Promise<ReviewStruct[]> => {
+  const contract = await getEthereumContract()
+  const reviews = await contract.getMyReviews(propertyId)
+  return reviewStructure(reviews)
+}
+
+const getReview = async (propertyId: number, reviewId: number): Promise<ReviewStruct> => {
+  const contract = await getEthereumContract()
+  const review = await contract.getReview(propertyId, reviewId)
+  return reviewStructure([review])[0]
+}
+
+const reviewStructure = (reviews: ReviewStruct[]): ReviewStruct[] =>
+  reviews.map((review) => ({
+    id: Number(review.id),
+    propertyId: Number(review.propertyId),
+    comment: review.comment,
+    reviewer: review.reviewer,
+    deleted: review.deleted,
+    timestamp: Number(review.timestamp),
+  }))
+
 const propertyStructure = (properties: PropertyStruct[]): PropertyStruct[] =>
   properties.map((property) => ({
     id: Number(property.id),
@@ -183,4 +244,9 @@ export {
   getAllProperties,
   getMyProperties,
   createReview,
+  updateReview,
+  deleteReview,
+  getAllReviews,
+  getMyReviews,
+  getReview,
 }

@@ -9,7 +9,7 @@ export interface TruncateParams {
 export interface PropertyParams {
   id?: number
   name: string
-  image: string
+  image: string[]
   category: string
   description: string
   location: string
@@ -23,9 +23,9 @@ export interface PropertyParams {
 //Property Structure
 export interface PropertyStruct {
   id: number
-  owner: number
+  owner: string
   name: string
-  image: string
+  image: string[]
   category: string
   description: string
   location: string
@@ -39,13 +39,10 @@ export interface PropertyStruct {
 }
 
 //Create Review Param
-export interface ReviewParam {
-  id?: number
+export interface ReviewParams {
   propertyId: number
+  id?: number
   comment: string
-  reviewer: number
-  deleted: boolean
-  timestamp: number
 }
 
 //Review Structure
@@ -53,7 +50,7 @@ export interface ReviewStruct {
   id: number
   propertyId: number
   comment: string
-  reviewer: number
+  reviewer: string
   deleted: boolean
   timestamp: number
 }
