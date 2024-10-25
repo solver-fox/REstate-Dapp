@@ -42,22 +42,6 @@ const Hero = () => {
                 List Property
               </Link>
             </div>
-
-            {/* Added stats section */}
-            <div className="grid grid-cols-3 gap-6 pt-6 border-t border-gray-800">
-              <div>
-                <p className="text-3xl font-bold text-white">500+</p>
-                <p className="text-gray-400">Properties</p>
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-white">50K</p>
-                <p className="text-gray-400">Users</p>
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-white">100M+</p>
-                <p className="text-gray-400">In Volume</p>
-              </div>
-            </div>
           </div>
 
           {/* Right featured property card - Updated styling */}
