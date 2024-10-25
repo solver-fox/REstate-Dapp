@@ -1,4 +1,4 @@
-// //SPDX-License-Identifier:MIT
+// SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
@@ -39,6 +39,7 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     string comment;
     address reviewer;
     bool deleted;
+    uint256 timestamp; // Added timestamp for review tracking
   }
 
   struct SaleStruct {
@@ -52,8 +53,11 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
   mapping(uint256 => SaleStruct[]) sales;
   mapping(uint256 => bool) propertyExist;
   mapping(uint256 => bool) reviewExist;
+  mapping(uint256 => mapping(uint256 => uint256)) private reviewIndexInProperty; // propertyId => reviewId => index
 
   uint256 private servicePct;
+
+  // Property Management Functions
 
   function createProperty(
     string memory name,
@@ -93,6 +97,9 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     property.built = built;
     property.squarefit = squarefit;
     property.price = price;
+
+    uint256 newPropertyId = _totalProperties.current();
+    _safeMint(msg.sender, newPropertyId);
 
     properties[property.id] = property;
     propertyExist[property.id] = true;
@@ -137,7 +144,7 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
   }
 
   function deleteProperty(uint256 id) public {
-    require(propertyExist[id], 'Property does not exisit');
+    require(propertyExist[id], 'Property does not exist');
     require(
       msg.sender == properties[id].owner || msg.sender == owner(),
       'Only property owner can delete property'
@@ -145,6 +152,8 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
 
     properties[id].deleted = true;
   }
+
+  // Property View Functions
 
   function getProperty(uint256 id) public view returns (PropertyStruct memory) {
     require(propertyExist[id], 'Property does not exist');
@@ -188,6 +197,8 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     }
   }
 
+  // Property Purchase Function
+
   function buyProperty(uint256 id) public payable nonReentrant {
     require(propertyExist[id], 'Property does not exist');
     require(msg.value >= properties[id].price, 'Insufficient payment');
@@ -218,38 +229,109 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     require(success);
   }
 
-  function createReview(uint256 id, string memory comment) public {
-    require(propertyExist[id], 'Property does not exist');
-    require(!properties[id].deleted, 'Property has been deleted');
+  // Review Management Functions
+
+  function createReview(uint256 propertyId, string memory comment) public {
+    require(propertyExist[propertyId], 'Property does not exist');
+    require(!properties[propertyId].deleted, 'Property has been deleted');
     require(bytes(comment).length > 0, 'Review must not be empty');
+    require(bytes(comment).length <= 1000, 'Review is too long');
 
     _totalReviews.increment();
     ReviewStruct memory review;
+    uint256 reviewId = _totalReviews.current();
 
-    review.id = _totalReviews.current();
-    review.propertyId = id;
+    review.id = reviewId;
+    review.propertyId = propertyId;
     review.reviewer = msg.sender;
     review.comment = comment;
+    review.deleted = false;
+    review.timestamp = block.timestamp;
 
-    reviews[id].push(review);
-    reviewExist[review.id] = true;
+    // Store the review index for easy access later
+    reviewIndexInProperty[propertyId][reviewId] = reviews[propertyId].length;
+    reviews[propertyId].push(review);
+    reviewExist[reviewId] = true;
   }
 
-  function updateReview(uint256 id, string memory comment) public {
-    require(propertyExist[id], 'Property does not exist');
-    require(reviewExist[id], 'Review does not exist');
+  function updateReview(uint256 propertyId, uint256 reviewId, string memory comment) public {
+    require(propertyExist[propertyId], 'Property does not exist');
+    require(!properties[propertyId].deleted, 'Property has been deleted');
+    require(reviewExist[reviewId], 'Review does not exist');
+    require(bytes(comment).length > 0, 'Review must not be empty');
+    require(bytes(comment).length <= 1000, 'Review is too long');
 
-    reviews[id][0].comment = comment;
+    uint256 reviewIndex = reviewIndexInProperty[propertyId][reviewId];
+    require(reviewIndex < reviews[propertyId].length, 'Review not found for this property');
+    require(reviews[propertyId][reviewIndex].reviewer == msg.sender, 'Only reviewer can update');
+    require(!reviews[propertyId][reviewIndex].deleted, 'Review has been deleted');
+
+    reviews[propertyId][reviewIndex].comment = comment;
+    reviews[propertyId][reviewIndex].timestamp = block.timestamp;
   }
 
-  function deleteReview(uint256 id) public {
-    require(propertyExist[id], 'Property does not exist');
-    require(reviewExist[id], 'Property does not exist');
+  function deleteReview(uint256 propertyId, uint256 reviewId) public {
+    require(propertyExist[propertyId], 'Property does not exist');
+    require(reviewExist[reviewId], 'Review does not exist');
 
-    reviews[id][0].deleted = true;
+    uint256 reviewIndex = reviewIndexInProperty[propertyId][reviewId];
+    require(reviewIndex < reviews[propertyId].length, 'Review not found for this property');
+    require(
+      reviews[propertyId][reviewIndex].reviewer == msg.sender || msg.sender == owner(),
+      'Only reviewer or contract owner can delete'
+    );
+    require(!reviews[propertyId][reviewIndex].deleted, 'Review already deleted');
+
+    reviews[propertyId][reviewIndex].deleted = true;
   }
 
-  function getReviews(uint256 id) public view returns (ReviewStruct[] memory) {
-    return reviews[id];
+  // Review View Functions
+
+  function getReviews(uint256 propertyId) public view returns (ReviewStruct[] memory) {
+    require(propertyExist[propertyId], 'Property does not exist');
+
+    // Count active reviews
+    uint256 activeCount = 0;
+    for (uint256 i = 0; i < reviews[propertyId].length; i++) {
+      if (!reviews[propertyId][i].deleted) {
+        activeCount++;
+      }
+    }
+
+    // Create array of active reviews
+    ReviewStruct[] memory activeReviews = new ReviewStruct[](activeCount);
+    uint256 index = 0;
+
+    for (uint256 i = 0; i < reviews[propertyId].length; i++) {
+      if (!reviews[propertyId][i].deleted) {
+        activeReviews[index] = reviews[propertyId][i];
+        index++;
+      }
+    }
+
+    return activeReviews;
+  }
+
+  function getMyReviewsForProperty(uint256 propertyId) public view returns (ReviewStruct[] memory) {
+    require(propertyExist[propertyId], 'Property does not exist');
+
+    uint256 myReviewCount = 0;
+    for (uint256 i = 0; i < reviews[propertyId].length; i++) {
+      if (reviews[propertyId][i].reviewer == msg.sender && !reviews[propertyId][i].deleted) {
+        myReviewCount++;
+      }
+    }
+
+    ReviewStruct[] memory myReviews = new ReviewStruct[](myReviewCount);
+    uint256 index = 0;
+
+    for (uint256 i = 0; i < reviews[propertyId].length; i++) {
+      if (reviews[propertyId][i].reviewer == msg.sender && !reviews[propertyId][i].deleted) {
+        myReviews[index] = reviews[propertyId][i];
+        index++;
+      }
+    }
+
+    return myReviews;
   }
 }
