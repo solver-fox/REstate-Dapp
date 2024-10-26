@@ -25,7 +25,7 @@ const Page: NextPage = () => {
     price: '',
   })
 
-  // Add spacing after useEffect
+ 
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false)
