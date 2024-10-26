@@ -95,9 +95,10 @@ const Header: React.FC = () => {
                 <div className="mt-6">
                   <nav className="grid gap-y-8">
                     <NavLink href="/">Home</NavLink>
-                    <NavLink href="/events">Properties</NavLink>
-                    <NavLink href="/events/create">List Property</NavLink>
-                    <NavLink href="/events/personal">My Properties</NavLink>
+                    <NavLink href="/properties">Properties</NavLink>
+                    <NavLink href="/properties/list">List Property</NavLink>
+                    <NavLink href="/properties/realtors">Realtors</NavLink>
+                    <NavLink href="/properties/personal">My Properties</NavLink>
                   </nav>
                 </div>
               </div>

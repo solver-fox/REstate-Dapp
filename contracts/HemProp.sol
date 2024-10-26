@@ -124,7 +124,7 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     property.location = location;
     property.city = city;
     property.state = state;
-    property.country =  country;
+    property.country = country;
     property.zipCode = zipCode;
     property.bedroom = bedroom;
     property.bathroom = bathroom;
@@ -276,7 +276,7 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     payTo(owner(), fee);
 
     address oldOwner = properties[id].owner;
-    
+
     properties[id].sold = true;
     properties[id].owner = msg.sender;
     _transfer(oldOwner, msg.sender, id);

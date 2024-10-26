@@ -25,6 +25,7 @@ const Page: NextPage = () => {
     price: '',
   })
 
+  // Add spacing after useEffect
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false)
@@ -43,6 +44,7 @@ const Page: NextPage = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!address) return toast.warn('Please connect your wallet')
+    
     await toast.promise(
       new Promise(async (resolve, reject) => {
         createProperty(property)
@@ -66,7 +68,7 @@ const Page: NextPage = () => {
   const resetForm = () => {
     setProperty({
       name: '',
-      images: [], // This will store image URLs
+      images: [], 
       category: '',
       description: '',
       location: '',
@@ -106,13 +108,14 @@ const Page: NextPage = () => {
         <div className="backdrop-blur-lg bg-gray-900 bg-opacity-50 rounded-2xl shadow-2xl p-8 border border-gray-800 animate-slide-up">
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Basic Information */}
-            <div className="space-y-4">
+            <div className="space-y-6">
               <h3 className="text-xl font-semibold text-white flex items-center gap-2">
                 <span className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
                   📝
                 </span>
                 Basic Information
               </h3>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="group">
                   <input
@@ -124,6 +127,7 @@ const Page: NextPage = () => {
                     className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
                   />
                 </div>
+
                 <div className="group">
                   <input
                     type="text"
@@ -135,6 +139,7 @@ const Page: NextPage = () => {
                   />
                 </div>
               </div>
+
               <textarea
                 name="description"
                 value={property.description}
@@ -145,7 +150,7 @@ const Page: NextPage = () => {
               />
             </div>
 
-            {/* Image Upload Section */}
+            {/* Property Images */}
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-white flex items-center gap-2">
                 <span className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
@@ -153,7 +158,7 @@ const Page: NextPage = () => {
                 </span>
                 Property Images
               </h3>
-              
+
               {/* Image Preview Section */}
               {property.images.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
@@ -165,25 +170,25 @@ const Page: NextPage = () => {
                         className="w-full h-48 object-cover rounded-lg"
                       />
                       <button
-                        type="button"
                         onClick={() => {
-                          setProperty(prev => ({
+                          setProperty((prev) => ({
                             ...prev,
-                            images: prev.images.filter((_, i) => i !== index)
+                            images: prev.images.filter((_, i) => i !== index),
                           }))
                         }}
-                        className="absolute top-2 right-2 p-1.5 bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                        className="absolute top-2 right-2 bg-red-500 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                       >
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          className="h-5 w-5" 
-                          viewBox="0 0 20 20" 
-                          fill="currentColor"
+                        <svg
+                          className="w-4 h-4 text-white"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
                         >
-                          <path 
-                            fillRule="evenodd" 
-                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" 
-                            clipRule="evenodd" 
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
                           />
                         </svg>
                       </button>
@@ -200,14 +205,14 @@ const Page: NextPage = () => {
                   className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 hover:border-blue-500"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
-                      e.preventDefault();
-                      const input = e.target as HTMLInputElement;
+                      e.preventDefault()
+                      const input = e.target as HTMLInputElement
                       if (input.value.trim()) {
-                        setProperty(prev => ({
+                        setProperty((prev) => ({
                           ...prev,
-                          images: [...prev.images, input.value.trim()]
-                        }));
-                        input.value = '';
+                          images: [...prev.images, input.value.trim()],
+                        }))
+                        input.value = ''
                       }
                     }
                   }}
@@ -215,13 +220,13 @@ const Page: NextPage = () => {
                 <button
                   type="button"
                   onClick={(e) => {
-                    const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                    const input = e.currentTarget.previousElementSibling as HTMLInputElement
                     if (input.value.trim()) {
-                      setProperty(prev => ({
+                      setProperty((prev) => ({
                         ...prev,
-                        images: [...prev.images, input.value.trim()]
-                      }));
-                      input.value = '';
+                        images: [...prev.images, input.value.trim()],
+                      }))
+                      input.value = ''
                     }
                   }}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -231,15 +236,15 @@ const Page: NextPage = () => {
               </div>
             </div>
 
-            {/* Property Details with Icons */}
-            <div className="space-y-4">
+            {/* Property Details */}
+            <div className="space-y-6">
               <h3 className="text-xl font-semibold text-white flex items-center gap-2">
-                <span
-                  className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                <span className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
                   🏠
                 </span>
                 Property Details
               </h3>
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <input
                   type="number"
@@ -249,6 +254,7 @@ const Page: NextPage = () => {
                   placeholder="Bedrooms"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
                 />
+
                 <input
                   type="number"
                   name="bathroom"
@@ -257,6 +263,7 @@ const Page: NextPage = () => {
                   placeholder="Bathrooms"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
                 />
+
                 <input
                   type="number"
                   name="squarefit"
@@ -265,6 +272,78 @@ const Page: NextPage = () => {
                   placeholder="Square Feet"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
                 />
+              </div>
+            </div>
+
+            {/* Location Details */}
+            <div className="space-y-6">
+              <h3 className="text-xl font-semibold text-white flex items-center gap-2">
+                <span className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                  📍
+                </span>
+                Location Details
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <input
+                  type="text"
+                  name="location"
+                  value={property.location}
+                  onChange={handleChange}
+                  placeholder="Street Address"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                />
+
+                <input
+                  type="text"
+                  name="city"
+                  value={property.city}
+                  onChange={handleChange}
+                  placeholder="City"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <input
+                  type="text"
+                  name="state"
+                  value={property.state}
+                  onChange={handleChange}
+                  placeholder="State"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                />
+
+                <input
+                  type="text"
+                  name="country"
+                  value={property.country}
+                  onChange={handleChange}
+                  placeholder="Country"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                />
+
+                <input
+                  type="text"
+                  name="zipCode"
+                  value={property.zipCode}
+                  onChange={handleChange}
+                  placeholder="Zip Code"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                />
+              </div>
+            </div>
+
+            {/* Additional Property Details */}
+            <div className="space-y-6">
+              <h3 className="text-xl font-semibold text-white flex items-center gap-2">
+                <span className="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center">
+                  📅
+                </span>
+                Additional Property Details
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <input
                   type="number"
                   name="built"
@@ -273,12 +352,13 @@ const Page: NextPage = () => {
                   placeholder="Year Built"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
                 />
+
                 <input
                   type="number"
                   name="price"
                   value={property.price}
                   onChange={handleChange}
-                  placeholder="Price in ETH"
+                  placeholder="Price (in ETH)"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
                 />
               </div>
