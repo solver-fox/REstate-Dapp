@@ -15,6 +15,8 @@ module.exports = {
         enabled: true,
         runs: 200,
       },
+      // Add the following line to enable viaIR
+      viaIR: true,
     },
   },
   mocha: {

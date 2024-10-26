@@ -106,6 +106,7 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     require(built > 0, 'Year built cannot be zero or empty');
     require(squarefit > 0, 'House size cannot be zero or empty');
     require(price > 0, 'Price must be greater than zero');
+    require(price <= 30, 'Price must be greater than zero');
 
     // Validate each image URL
     for (uint i = 0; i < images.length; i++) {

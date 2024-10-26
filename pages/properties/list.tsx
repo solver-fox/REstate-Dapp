@@ -1,13 +1,13 @@
 import { createProperty } from '@/services/blockchain'
 import { PropertyParams } from '@/utils/type.dt'
 import { NextPage } from 'next'
-import React, { useEffect, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useState } from 'react'
 import { toast } from 'react-toastify'
 import { useAccount } from 'wagmi'
 
 const Page: NextPage = () => {
   const { address } = useAccount()
-  const [loading, setLoading] = useState(true)
+
   const [property, setProperty] = useState<PropertyParams>({
     name: '',
     images: [], // This will store image URLs
@@ -25,15 +25,7 @@ const Page: NextPage = () => {
     price: '',
   })
 
- 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false)
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [])
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setProperty((prevState) => ({
       ...prevState,
@@ -41,10 +33,10 @@ const Page: NextPage = () => {
     }))
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (!address) return toast.warn('Please connect your wallet')
-    
+
     await toast.promise(
       new Promise(async (resolve, reject) => {
         createProperty(property)
@@ -68,7 +60,7 @@ const Page: NextPage = () => {
   const resetForm = () => {
     setProperty({
       name: '',
-      images: [], 
+      images: [],
       category: '',
       description: '',
       location: '',
@@ -368,10 +360,9 @@ const Page: NextPage = () => {
             <div className="flex justify-end">
               <button
                 type="submit"
-                disabled={loading}
                 className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Processing...' : 'List Property'}
+                Submit
               </button>
             </div>
           </form>
