@@ -77,7 +77,7 @@ const Header: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <Link href={'/'} className="text-xl font-bold text-white">
-                      Event X
+                      HemProp
                     </Link>
                   </div>
                   <div className="-mr-2">

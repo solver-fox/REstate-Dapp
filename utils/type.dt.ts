@@ -16,12 +16,12 @@ export interface PropertyParams {
   city: string
   state: string
   country: string
-  zipCode: number
-  bedroom: number
-  bathroom: number
-  built: number
-  squarefit: number
-  price: number
+  zipCode: string | number
+  bedroom: string | number
+  bathroom: string | number
+  built: string | number
+  squarefit: string | number
+  price: string | number
 }
 
 //Property Structure
