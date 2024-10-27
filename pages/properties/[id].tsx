@@ -219,7 +219,7 @@ const PropertyDetails = () => {
 
   return (
     <div className="min-h-screen bg-black text-gray-100">
-      <div className="relative h-[70vh] w-full">
+      <div className="relative h-[50vh] sm:h-[70vh] w-full"> {/* Reduced height on mobile */}
         <Image
           src={property?.images[selectedImage] || ''}
           alt={property?.name}
@@ -229,28 +229,28 @@ const PropertyDetails = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
-        <div className="absolute bottom-0 left-0 right-0 p-8">
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8"> {/* Reduced padding on mobile */}
           <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="flex flex-col gap-4">
               <div>
-                <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">{property?.name}</h1>
-                <div className="flex items-center space-x-4 text-gray-300">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">{property?.name}</h1>
+                <div className="flex flex-wrap items-center gap-4 text-sm sm:text-base text-gray-300">
                   <span className="flex items-center">
-                    <BiMap className="w-5 h-5 mr-2" />
+                    <BiMap className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                     {property?.location}, {property?.city}
                   </span>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <div className="text-3xl font-bold text-white flex items-center">
-                  <FaEthereum className="w-8 h-8 mr-2" />
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="text-2xl sm:text-3xl font-bold text-white flex items-center">
+                  <FaEthereum className="w-6 h-6 sm:w-8 sm:h-8 mr-2" />
                   {property?.price} ETH
                 </div>
                 <button
                   onClick={handleShare}
                   className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
                 >
-                  <BiShare className="w-6 h-6" />
+                  <BiShare className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
               </div>
             </div>
@@ -259,9 +259,9 @@ const PropertyDetails = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Property Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* Property Stats - Update grid layout */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8 sm:mb-12">
           <PropertyStat icon={<BiBed />} value={property?.bedroom} label="Bedrooms" />
           <PropertyStat icon={<BiBath />} value={property?.bathroom} label="Bathrooms" />
           <PropertyStat icon={<BiArea />} value={property?.squarefit} label="Square Feet" />
@@ -275,7 +275,7 @@ const PropertyDetails = () => {
             {/* Image Gallery */}
             <div className="space-y-6">
               <h2 className="text-2xl font-bold">Gallery</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
                 {property?.images.slice(0, 8).map((image, index) => (
                   <div
                     key={index}
@@ -546,11 +546,11 @@ const PropertyStat = ({
   value: string | number
   label: string
 }) => (
-  <div className="bg-gray-900 rounded-xl p-4">
-    <div className="flex items-center gap-3">
-      <div className="text-blue-400 text-xl">{icon}</div>
+  <div className="bg-gray-900 rounded-xl p-3 sm:p-4">
+    <div className="flex items-center gap-2 sm:gap-3">
+      <div className="text-blue-400 text-lg sm:text-xl">{icon}</div>
       <div>
-        <div className="text-lg font-semibold">{value}</div>
+        <div className="text-base sm:text-lg font-semibold">{value}</div>
         <div className="text-xs text-gray-400">{label}</div>
       </div>
     </div>
