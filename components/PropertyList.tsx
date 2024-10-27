@@ -1,8 +1,9 @@
 import { PropertyStruct } from '@/utils/type.dt'
 import React, { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { BsGrid, BsList } from 'react-icons/bs'
-import { BiBed, BiBath, BiArea } from 'react-icons/bi'
+import { motion, AnimatePresence } from 'framer-motion'
+import { BsGrid, BsList, BsFilter } from 'react-icons/bs'
+import { BiBed, BiBath, BiArea, BiMap } from 'react-icons/bi'
+import Link from 'next/link'
 
 interface PropertyCardProps {
   property: PropertyStruct
@@ -12,10 +13,11 @@ interface PropertyCardProps {
 const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode }) => {
   return (
     <motion.div
-      variants={{
-        hidden: { y: 20, opacity: 0 },
-        visible: { y: 0, opacity: 1 }
-      }}
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
       className={`bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-all duration-300 ${
         viewMode === 'list' ? 'flex' : ''
       }`}
@@ -27,15 +29,18 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode }) => {
           className="w-full h-full object-cover"
         />
         <div className="absolute top-4 right-4 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-          ${property.price.toLocaleString()}
+          {property.price.toLocaleString()} ETH
         </div>
       </div>
       
       <div className={`p-6 ${viewMode === 'list' ? 'w-2/3' : ''}`}>
         <h3 className="text-xl font-bold text-white mb-2">{property.name}</h3>
-        <p className="text-zinc-400 mb-4">{property.location}</p>
+        <p className="text-zinc-400 mb-4 flex items-center">
+          <BiMap className="mr-2" />
+          {property.location}
+        </p>
         
-        <div className="flex items-center space-x-4 text-zinc-400">
+        <div className="flex items-center space-x-4 text-zinc-400 mb-4">
           <div className="flex items-center">
             <BiBed className="mr-2" />
             <span>{property.bedroom} beds</span>
@@ -48,6 +53,21 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode }) => {
             <BiArea className="mr-2" />
             <span>{property.squarefit.toLocaleString()} sqft</span>
           </div>
+        </div>
+
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-sm text-zinc-500">Listed by: {property.owner.slice(0, 6)}...{property.owner.slice(-4)}</span>
+          <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm">
+            {property.category}
+          </span>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <Link href={`/properties/${property.id}`}>
+            <span className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+              View Details
+            </span>
+          </Link>
         </div>
       </div>
     </motion.div>
@@ -65,10 +85,14 @@ const PropertySkeleton: React.FC<{ viewMode: 'grid' | 'list' }> = ({ viewMode })
       <div className={`p-6 ${viewMode === 'list' ? 'w-2/3' : ''}`}>
         <div className="h-6 bg-zinc-800 rounded w-3/4 mb-4" />
         <div className="h-4 bg-zinc-800 rounded w-1/2 mb-4" />
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 mb-4">
           <div className="h-4 bg-zinc-800 rounded w-16" />
           <div className="h-4 bg-zinc-800 rounded w-16" />
           <div className="h-4 bg-zinc-800 rounded w-16" />
+        </div>
+        <div className="flex justify-between">
+          <div className="h-4 bg-zinc-800 rounded w-24" />
+          <div className="h-8 bg-zinc-800 rounded w-24" />
         </div>
       </div>
     </div>
@@ -79,6 +103,15 @@ const PropertyList: React.FC<{ properties: PropertyStruct[] }> = ({ properties }
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [sortBy, setSortBy] = useState<'price' | 'size' | 'date'>('price')
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [filteredProperties, setFilteredProperties] = useState<PropertyStruct[]>(properties)
+  const [filters, setFilters] = useState({
+    minPrice: '',
+    maxPrice: '',
+    minBedrooms: '',
+    minBathrooms: '',
+    propertyType: ''
+  })
   
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -86,6 +119,10 @@ const PropertyList: React.FC<{ properties: PropertyStruct[] }> = ({ properties }
     }, 2000)
     return () => clearTimeout(timer)
   }, [])
+
+  useEffect(() => {
+    setFilteredProperties(properties)
+  }, [properties])
 
   const sortProperties = (props: PropertyStruct[]) => {
     return [...props].sort((a, b) => {
@@ -100,20 +137,37 @@ const PropertyList: React.FC<{ properties: PropertyStruct[] }> = ({ properties }
     })
   }
 
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFilters({ ...filters, [e.target.name]: e.target.value })
+  }
+
+  const applyFilters = () => {
+    let filtered = properties.filter(property => {
+      if (filters.minPrice && property.price < parseFloat(filters.minPrice)) return false
+      if (filters.maxPrice && property.price > parseFloat(filters.maxPrice)) return false
+      if (filters.minBedrooms && property.bedroom < parseInt(filters.minBedrooms)) return false
+      if (filters.minBathrooms && property.bathroom < parseInt(filters.minBathrooms)) return false
+      if (filters.propertyType && property.category !== filters.propertyType) return false
+      return true
+    })
+    setFilteredProperties(filtered)
+    setFilterOpen(false)
+  }
+
   return (
-    <section className="pt-24 pb-16 bg-black">
+    <section className="pt-24 pb-16 bg-black min-h-screen">
       <main className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-12">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <motion.h2
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600"
+            className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 mb-4 md:mb-0"
           >
             Featured Properties
           </motion.h2>
           
-          <div className="flex items-center space-x-4 mt-4 md:mt-0">
+          <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center space-x-2 bg-zinc-900 border border-zinc-800 rounded-lg p-2">
               <button
                 onClick={() => setViewMode('grid')}
@@ -138,47 +192,116 @@ const PropertyList: React.FC<{ properties: PropertyStruct[] }> = ({ properties }
               <option value="size">Size</option>
               <option value="date">Date</option>
             </select>
+
+            <button
+              onClick={() => setFilterOpen(!filterOpen)}
+              className="bg-zinc-900 text-zinc-300 border border-zinc-800 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent flex items-center"
+            >
+              <BsFilter className="mr-2" />
+              Filter
+            </button>
           </div>
         </div>
+
+        {filterOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-8"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+              <input
+                type="number"
+                name="minPrice"
+                placeholder="Min Price"
+                value={filters.minPrice}
+                onChange={handleFilterChange}
+                className="bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-lg p-2"
+              />
+              <input
+                type="number"
+                name="maxPrice"
+                placeholder="Max Price"
+                value={filters.maxPrice}
+                onChange={handleFilterChange}
+                className="bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-lg p-2"
+              />
+              <input
+                type="number"
+                name="minBedrooms"
+                placeholder="Min Bedrooms"
+                value={filters.minBedrooms}
+                onChange={handleFilterChange}
+                className="bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-lg p-2"
+              />
+              <input
+                type="number"
+                name="minBathrooms"
+                placeholder="Min Bathrooms"
+                value={filters.minBathrooms}
+                onChange={handleFilterChange}
+                className="bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-lg p-2"
+              />
+              <select
+                name="propertyType"
+                value={filters.propertyType}
+                onChange={handleFilterChange}
+                className="bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-lg p-2"
+              >
+                <option value="">All Property Types</option>
+                <option value="House">House</option>
+                <option value="Apartment">Apartment</option>
+                <option value="Condo">Condo</option>
+              </select>
+            </div>
+            <button
+              onClick={applyFilters}
+              className="w-full sm:w-auto bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition-colors"
+            >
+              Apply Filters
+            </button>
+          </motion.div>
+        )}
 
         {loading ? (
           <div className={`grid ${
             viewMode === 'grid' 
-              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'
+              ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'
               : 'grid-cols-1 gap-4'
           }`}>
-            {[1, 2, 3].map((i) => (
+            {[1, 2, 3, 4, 5, 6].map((i) => (
               <PropertySkeleton key={i} viewMode={viewMode} />
             ))}
           </div>
         ) : (
+          <AnimatePresence>
+            <motion.div
+              layout
+              className={`grid ${
+                viewMode === 'grid'
+                  ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'
+                  : 'grid-cols-1 gap-4'
+              }`}
+            >
+              {sortProperties(filteredProperties).map((property) => (
+                <PropertyCard
+                  key={property.id}
+                  property={property}
+                  viewMode={viewMode}
+                />
+              ))}
+            </motion.div>
+          </AnimatePresence>
+        )}
+
+        {!loading && filteredProperties.length === 0 && (
           <motion.div
-            variants={{
-              hidden: { opacity: 1, scale: 0.8 },
-              visible: {
-                opacity: 1,
-                scale: 1,
-                transition: {
-                  delayChildren: 0.3,
-                  staggerChildren: 0.1
-                }
-              }
-            }}
-            initial="hidden"
-            animate="visible"
-            className={`grid ${
-              viewMode === 'grid'
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'
-                : 'grid-cols-1 gap-4'
-            }`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center text-zinc-400 mt-12"
           >
-            {sortProperties(properties).map((property) => (
-              <PropertyCard
-                key={property.id}
-                property={property}
-                viewMode={viewMode}
-              />
-            ))}
+            No properties found matching your criteria.
           </motion.div>
         )}
       </main>

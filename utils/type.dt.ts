@@ -10,7 +10,7 @@ export interface PropertyParams {
   id?: number
   name: string
   images: string[]
-  category: string
+  category: 'House' | 'Apartment' | 'Condo' | 'Townhouse' | 'Villa'
   description: string
   location: string
   city: string
@@ -30,7 +30,7 @@ export interface PropertyStruct {
   owner: string
   name: string
   images: string[]
-  category: string
+  category: 'House' | 'Apartment' | 'Condo' | 'Townhouse' | 'Villa'
   description: string
   location: string
   city: string

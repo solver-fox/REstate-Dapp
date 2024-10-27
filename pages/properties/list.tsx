@@ -10,8 +10,8 @@ const Page: NextPage = () => {
 
   const [property, setProperty] = useState<PropertyParams>({
     name: '',
-    images: [], // This will store image URLs
-    category: '',
+    images: [],
+    category: 'House',
     description: '',
     location: '',
     city: '',
@@ -25,7 +25,10 @@ const Page: NextPage = () => {
     price: '',
   })
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // Add a new state for the image input
+  const [imageInput, setImageInput] = useState<string>('');
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setProperty((prevState) => ({
       ...prevState,
@@ -33,24 +36,32 @@ const Page: NextPage = () => {
     }))
   }
 
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (!address) return toast.warn('Please connect your wallet')
 
+    // Log the images to debug
+    console.log('Images:', property.images);
+
+    // Check if images are provided
+    if (property.images.length === 0 || property.images.some(image => !image.trim())) {
+        return toast.warn('Please provide at least one valid image URL')
+    }
+
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        createProperty(property)
-          .then((tx) => {
-            console.log(tx)
-            resetForm()
-            resolve(tx)
-          })
-          .catch((error) => {
-            reject(error)
-          })
+        try {
+          const tx = await createProperty(property) // Ensure we await the createProperty function
+          console.log(tx)
+          resetForm()
+          resolve(tx)
+        } catch (error) {
+          reject(error) // Handle error properly
+        }
       }),
       {
-        pending: 'Uploaing Property...',
+        pending: 'Uploading Property...',
         success: 'Property uploaded successfully',
         error: 'Failed to upload Property',
       }
@@ -61,7 +72,7 @@ const Page: NextPage = () => {
     setProperty({
       name: '',
       images: [],
-      category: '',
+      category: 'House',
       description: '',
       location: '',
       city: '',
@@ -117,18 +128,24 @@ const Page: NextPage = () => {
                     onChange={handleChange}
                     placeholder="Property Name"
                     className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                    required 
                   />
                 </div>
 
                 <div className="group">
-                  <input
-                    type="text"
+                  <select
                     name="category"
                     value={property.category}
                     onChange={handleChange}
-                    placeholder="Category (e.g., Apartment, House)"
                     className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
-                  />
+                    required
+                  >
+                    <option value="House">House</option>
+                    <option value="Apartment">Apartment</option>
+                    <option value="Condo">Condo</option>
+                    <option value="Townhouse">Townhouse</option>
+                    <option value="Villa">Villa</option>
+                  </select>
                 </div>
               </div>
 
@@ -139,6 +156,7 @@ const Page: NextPage = () => {
                 placeholder="Property Description"
                 rows={4}
                 className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 hover:border-blue-500"
+                required 
               />
             </div>
 
@@ -194,31 +212,20 @@ const Page: NextPage = () => {
                 <input
                   type="url"
                   placeholder="Enter image URL"
+                  value={imageInput} // Bind the input value to the state
+                  onChange={(e) => setImageInput(e.target.value)} // Update state on change
                   className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 hover:border-blue-500"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault()
-                      const input = e.target as HTMLInputElement
-                      if (input.value.trim()) {
-                        setProperty((prev) => ({
-                          ...prev,
-                          images: [...prev.images, input.value.trim()],
-                        }))
-                        input.value = ''
-                      }
-                    }
-                  }}
                 />
                 <button
                   type="button"
-                  onClick={(e) => {
-                    const input = e.currentTarget.previousElementSibling as HTMLInputElement
-                    if (input.value.trim()) {
-                      setProperty((prev) => ({
-                        ...prev,
-                        images: [...prev.images, input.value.trim()],
-                      }))
-                      input.value = ''
+                  onClick={() => {
+                    if (imageInput.trim()) {
+                      setProperty((prev) => {
+                        const newImages = [...prev.images, imageInput.trim()];
+                        console.log('Updated Images:', newImages); // Log updated images
+                        return { ...prev, images: newImages };
+                      });
+                      setImageInput(''); // Clear the input after adding
                     }
                   }}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -245,6 +252,7 @@ const Page: NextPage = () => {
                   onChange={handleChange}
                   placeholder="Bedrooms"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                  required 
                 />
 
                 <input
@@ -254,6 +262,7 @@ const Page: NextPage = () => {
                   onChange={handleChange}
                   placeholder="Bathrooms"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                  required 
                 />
 
                 <input
@@ -263,6 +272,7 @@ const Page: NextPage = () => {
                   onChange={handleChange}
                   placeholder="Square Feet"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                  required 
                 />
               </div>
             </div>
@@ -284,6 +294,7 @@ const Page: NextPage = () => {
                   onChange={handleChange}
                   placeholder="Street Address"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                  required 
                 />
 
                 <input
@@ -293,6 +304,7 @@ const Page: NextPage = () => {
                   onChange={handleChange}
                   placeholder="City"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                  required 
                 />
               </div>
 
@@ -304,6 +316,7 @@ const Page: NextPage = () => {
                   onChange={handleChange}
                   placeholder="State"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                  required 
                 />
 
                 <input
@@ -313,6 +326,7 @@ const Page: NextPage = () => {
                   onChange={handleChange}
                   placeholder="Country"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                  required 
                 />
 
                 <input
@@ -322,6 +336,7 @@ const Page: NextPage = () => {
                   onChange={handleChange}
                   placeholder="Zip Code"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                  required 
                 />
               </div>
             </div>
@@ -343,6 +358,7 @@ const Page: NextPage = () => {
                   onChange={handleChange}
                   placeholder="Year Built"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                  required 
                 />
 
                 <input
@@ -352,6 +368,7 @@ const Page: NextPage = () => {
                   onChange={handleChange}
                   placeholder="Price (in ETH)"
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                  required 
                 />
               </div>
             </div>
