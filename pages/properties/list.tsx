@@ -25,78 +25,90 @@ const Page: NextPage = () => {
     price: '',
   })
 
- 
-  const [imageInput, setImageInput] = useState<string>('');
+  const [imageInput, setImageInput] = useState<string>('')
 
- 
-  const [errors, setErrors] = useState<{ [key in keyof PropertyParams]?: string }>({});
+  const [errors, setErrors] = useState<{ [key in keyof PropertyParams]?: string }>({})
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // Replace the houseTypes array with this one to match the types exactly
+  const houseTypes = [
+    'House',
+    'Apartment',
+    'Condo',
+    'Townhouse',
+    'Villa'
+  ] as const;
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target
     setProperty((prevState) => ({
       ...prevState,
       [name]: value,
     }))
-   
+
     if (errors[name as keyof PropertyParams]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: undefined
-      }));
+        [name]: undefined,
+      }))
     }
   }
-
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (!address) return toast.warn('Please connect your wallet')
 
-  
     const requiredFields: (keyof PropertyParams)[] = [
-      'name', 'category', 'description', 'location', 'city',
-      'state', 'country', 'zipCode', 'bedroom', 'bathroom',
-      'built', 'squarefit', 'price'
-    ];
+      'name',
+      'category',
+      'description',
+      'location',
+      'city',
+      'state',
+      'country',
+      'zipCode',
+      'bedroom',
+      'bathroom',
+      'built',
+      'squarefit',
+      'price',
+    ]
 
-    const newErrors: { [key in keyof PropertyParams]?: string } = {};
-    requiredFields.forEach(field => {
+    const newErrors: { [key in keyof PropertyParams]?: string } = {}
+    requiredFields.forEach((field) => {
       if (!property[field]) {
-        newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
+        newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`
       }
-    });
+    })
 
-    
     if (property.images.length === 0) {
-      newErrors.images = 'At least one image is required';
+      newErrors.images = 'At least one image is required'
     }
 
-   
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      toast.error('Please fill in all required fields');
-      return;
+      setErrors(newErrors)
+      toast.error('Please fill in all required fields')
+      return
     }
 
- 
-    setErrors({});
+    setErrors({})
 
+    console.log('Images:', property.images)
 
-    console.log('Images:', property.images);
-
-    
-    if (property.images.length === 0 || property.images.some(image => !image.trim())) {
-        return toast.warn('Please provide at least one valid image URL')
+    if (property.images.length === 0 || property.images.some((image) => !image.trim())) {
+      return toast.warn('Please provide at least one valid image URL')
     }
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
         try {
-          const tx = await createProperty(property) 
+          const tx = await createProperty(property)
           console.log(tx)
           resetForm()
           resolve(tx)
         } catch (error) {
-          reject(error) 
+          reject(error)
         }
       }),
       {
@@ -171,23 +183,25 @@ const Page: NextPage = () => {
                     } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
                     required
                   />
-                  {errors.name && (
-                    <p className="mt-1 text-sm text-red-500">{errors.name}</p>
-                  )}
+                  {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
                 </div>
 
                 <div className="group">
-                  <input
-                    type="text"
+                  <select
                     name="category"
                     value={property.category}
                     onChange={handleChange}
-                    placeholder="Category (e.g., Apartment, House)"
                     className={`w-full px-4 py-3 bg-gray-800 border ${
                       errors.category ? 'border-red-500' : 'border-gray-700'
                     } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
                     required
-                  />
+                  >
+                    {houseTypes.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
                   {errors.category && (
                     <p className="mt-1 text-sm text-red-500">{errors.category}</p>
                   )}
@@ -262,8 +276,8 @@ const Page: NextPage = () => {
                 <input
                   type="url"
                   placeholder="Enter image URL"
-                  value={imageInput} 
-                  onChange={(e) => setImageInput(e.target.value)} 
+                  value={imageInput}
+                  onChange={(e) => setImageInput(e.target.value)}
                   className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 hover:border-blue-500"
                 />
                 <button
@@ -271,11 +285,11 @@ const Page: NextPage = () => {
                   onClick={() => {
                     if (imageInput.trim()) {
                       setProperty((prev) => {
-                        const newImages = [...prev.images, imageInput.trim()];
-                        console.log('Updated Images:', newImages);
-                        return { ...prev, images: newImages };
-                      });
-                      setImageInput(''); 
+                        const newImages = [...prev.images, imageInput.trim()]
+                        console.log('Updated Images:', newImages)
+                        return { ...prev, images: newImages }
+                      })
+                      setImageInput('')
                     }
                   }}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -306,9 +320,7 @@ const Page: NextPage = () => {
                   } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
                   required
                 />
-                {errors.bedroom && (
-                  <p className="mt-1 text-sm text-red-500">{errors.bedroom}</p>
-                )}
+                {errors.bedroom && <p className="mt-1 text-sm text-red-500">{errors.bedroom}</p>}
 
                 <input
                   type="number"
@@ -321,9 +333,7 @@ const Page: NextPage = () => {
                   } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
                   required
                 />
-                {errors.bathroom && (
-                  <p className="mt-1 text-sm text-red-500">{errors.bathroom}</p>
-                )}
+                {errors.bathroom && <p className="mt-1 text-sm text-red-500">{errors.bathroom}</p>}
 
                 <input
                   type="number"
@@ -363,9 +373,7 @@ const Page: NextPage = () => {
                   } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
                   required
                 />
-                {errors.location && (
-                  <p className="mt-1 text-sm text-red-500">{errors.location}</p>
-                )}
+                {errors.location && <p className="mt-1 text-sm text-red-500">{errors.location}</p>}
 
                 <input
                   type="text"
@@ -378,9 +386,7 @@ const Page: NextPage = () => {
                   } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
                   required
                 />
-                {errors.city && (
-                  <p className="mt-1 text-sm text-red-500">{errors.city}</p>
-                )}
+                {errors.city && <p className="mt-1 text-sm text-red-500">{errors.city}</p>}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -395,9 +401,7 @@ const Page: NextPage = () => {
                   } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
                   required
                 />
-                {errors.state && (
-                  <p className="mt-1 text-sm text-red-500">{errors.state}</p>
-                )}
+                {errors.state && <p className="mt-1 text-sm text-red-500">{errors.state}</p>}
 
                 <input
                   type="text"
@@ -410,9 +414,7 @@ const Page: NextPage = () => {
                   } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
                   required
                 />
-                {errors.country && (
-                  <p className="mt-1 text-sm text-red-500">{errors.country}</p>
-                )}
+                {errors.country && <p className="mt-1 text-sm text-red-500">{errors.country}</p>}
 
                 <input
                   type="text"
@@ -425,9 +427,7 @@ const Page: NextPage = () => {
                   } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
                   required
                 />
-                {errors.zipCode && (
-                  <p className="mt-1 text-sm text-red-500">{errors.zipCode}</p>
-                )}
+                {errors.zipCode && <p className="mt-1 text-sm text-red-500">{errors.zipCode}</p>}
               </div>
             </div>
 
@@ -452,9 +452,7 @@ const Page: NextPage = () => {
                   } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
                   required
                 />
-                {errors.built && (
-                  <p className="mt-1 text-sm text-red-500">{errors.built}</p>
-                )}
+                {errors.built && <p className="mt-1 text-sm text-red-500">{errors.built}</p>}
 
                 <input
                   type="number"
@@ -467,9 +465,7 @@ const Page: NextPage = () => {
                   } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
                   required
                 />
-                {errors.price && (
-                  <p className="mt-1 text-sm text-red-500">{errors.price}</p>
-                )}
+                {errors.price && <p className="mt-1 text-sm text-red-500">{errors.price}</p>}
               </div>
             </div>
 

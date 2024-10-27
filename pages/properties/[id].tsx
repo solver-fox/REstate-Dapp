@@ -1,10 +1,31 @@
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
-import { getProperty, createReview, getAllReviews, buyProperty, deleteReview, deleteProperty } from '@/services/blockchain'
+import {
+  getProperty,
+  createReview,
+  getAllReviews,
+  buyProperty,
+  deleteReview,
+  deleteProperty,
+} from '@/services/blockchain'
 import { PropertyStruct, ReviewStruct } from '@/utils/type.dt'
 import { useAccount } from 'wagmi'
 import { toast } from 'react-toastify'
-import { BiBed, BiBath, BiArea, BiMap, BiUser, BiCalendar, BiBuilding, BiTrash, BiShare, BiHeart, BiChevronLeft, BiChevronRight, BiEdit } from 'react-icons/bi'
+import {
+  BiBed,
+  BiBath,
+  BiArea,
+  BiMap,
+  BiUser,
+  BiCalendar,
+  BiBuilding,
+  BiTrash,
+  BiShare,
+  BiHeart,
+  BiChevronLeft,
+  BiChevronRight,
+  BiEdit,
+} from 'react-icons/bi'
 import { FaEthereum } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
 import PropertyActions from '@/components/PropertyActions'
@@ -100,7 +121,7 @@ const PropertyDetails = () => {
 
   const handleDeleteReview = async (reviewId: number) => {
     if (!property) return
-    
+
     try {
       await deleteReview(reviewId, property.id)
       toast.success('Review deleted successfully!')
@@ -124,18 +145,21 @@ const PropertyDetails = () => {
     }
   }
 
-  // Image Navigation Component
   const ImageNavigation = () => (
     <div className="absolute inset-0 flex items-center justify-between p-4">
       <button
-        onClick={() => setSelectedImage((prev) => (prev > 0 ? prev - 1 : property!.images.length - 1))}
+        onClick={() =>
+          setSelectedImage((prev) => (prev > 0 ? prev - 1 : property!.images.length - 1))
+        }
         className="p-2 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/50 transition-all group"
       >
         <BiChevronLeft className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
       </button>
 
       <button
-        onClick={() => setSelectedImage((prev) => (prev < property!.images.length - 1 ? prev + 1 : 0))}
+        onClick={() =>
+          setSelectedImage((prev) => (prev < property!.images.length - 1 ? prev + 1 : 0))
+        }
         className="p-2 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/50 transition-all group"
       >
         <BiChevronRight className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
@@ -143,16 +167,14 @@ const PropertyDetails = () => {
     </div>
   )
 
-  // Add these new functions to handle edit and delete
   const handleEditProperty = () => {
     router.push(`/properties/edit/${property?.id}`)
   }
 
   const handleDeleteProperty = async () => {
     if (!property) return
-    
+
     try {
-      // Add your deleteProperty function call here
       await deleteProperty(property.id)
       toast.success('Property deleted successfully!')
       router.push('/properties/personal')
@@ -162,7 +184,6 @@ const PropertyDetails = () => {
     }
   }
 
-  // Updated Loading State
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center">
@@ -174,7 +195,6 @@ const PropertyDetails = () => {
     )
   }
 
-  // Updated Error State
   if (!property) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex flex-col items-center justify-center p-4">
@@ -183,8 +203,10 @@ const PropertyDetails = () => {
             <BiBuilding className="w-12 h-12 text-gray-400" />
           </div>
           <h1 className="text-3xl font-bold text-white">Property Not Found</h1>
-          <p className="text-gray-400">The property you're looking for doesn't exist or has been removed.</p>
-          <button 
+          <p className="text-gray-400">
+            The property you're looking for doesn't exist or has been removed.
+          </p>
+          <button
             onClick={() => router.push('/properties')}
             className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all"
           >
@@ -197,7 +219,6 @@ const PropertyDetails = () => {
 
   return (
     <div className="min-h-screen bg-black text-gray-100">
-      {/* Hero Section with Main Image */}
       <div className="relative h-[70vh] w-full">
         <Image
           src={property?.images[selectedImage] || ''}
@@ -207,19 +228,7 @@ const PropertyDetails = () => {
           className="brightness-50"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-        
-        {/* Navigation */}
-        <div className="absolute top-0 left-0 right-0 p-6">
-          <button 
-            onClick={() => router.back()}
-            className="flex items-center space-x-2 text-white hover:text-blue-400 transition-colors"
-          >
-            <BiChevronLeft className="w-6 h-6" />
-            <span>Back to listings</span>
-          </button>
-        </div>
 
-        {/* Property Title & Price */}
         <div className="absolute bottom-0 left-0 right-0 p-8">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -237,7 +246,7 @@ const PropertyDetails = () => {
                   <FaEthereum className="w-8 h-8 mr-2" />
                   {property?.price} ETH
                 </div>
-                <button 
+                <button
                   onClick={handleShare}
                   className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
                 >
@@ -323,7 +332,7 @@ const PropertyDetails = () => {
             {/* Reviews Section */}
             <div className="space-y-6">
               <h2 className="text-2xl font-bold">Reviews</h2>
-              
+
               {/* Review Form */}
               <form onSubmit={handleSubmitReview} className="bg-gray-900 rounded-2xl p-6">
                 <textarea
@@ -389,13 +398,13 @@ const PropertyDetails = () => {
                     <span>Buy for {property?.price} ETH</span>
                   </button>
                 )}
-                
+
                 {isOwner && !property?.sold && (
                   <div className="space-y-3">
                     <div className="text-center py-2 px-4 bg-gray-800 rounded-xl">
                       <p className="text-gray-400">You own this property</p>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         onClick={handleEditProperty}
@@ -404,7 +413,7 @@ const PropertyDetails = () => {
                         <BiEdit className="w-5 h-5" />
                         <span>Edit</span>
                       </button>
-                      
+
                       <button
                         onClick={() => setShowDeleteModal(true)}
                         className="py-3 px-4 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2"
@@ -415,7 +424,7 @@ const PropertyDetails = () => {
                     </div>
                   </div>
                 )}
-                
+
                 {!isOwner && property?.sold && (
                   <div className="text-center py-2 px-4 bg-gray-800 rounded-xl">
                     <p className="text-gray-400">This property has been sold</p>
@@ -496,8 +505,19 @@ const PropertyDetails = () => {
                 onClick={() => setShowModal(false)}
                 className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-colors"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
               <Image
@@ -517,7 +537,15 @@ const PropertyDetails = () => {
 }
 
 // Updated PropertyStat Component
-const PropertyStat = ({ icon, value, label }: { icon: React.ReactNode, value: string | number, label: string }) => (
+const PropertyStat = ({
+  icon,
+  value,
+  label,
+}: {
+  icon: React.ReactNode
+  value: string | number
+  label: string
+}) => (
   <div className="bg-gray-900 rounded-xl p-4">
     <div className="flex items-center gap-3">
       <div className="text-blue-400 text-xl">{icon}</div>
