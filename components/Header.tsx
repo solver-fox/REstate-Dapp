@@ -4,10 +4,12 @@ import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CgMenuLeft } from 'react-icons/cg'
 import { FaTimes } from 'react-icons/fa'
+import { useAccount } from 'wagmi'
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [scrolled, setScrolled] = useState<boolean>(false)
+  const { address } = useAccount()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,6 +18,16 @@ const Header: React.FC = () => {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  const navLinks = [
+    { href: '/', label: 'Home' },
+    { href: '/properties', label: 'Properties' },
+    { href: '/properties/realtors', label: 'Realtors' },
+    ...(address ? [
+      { href: '/properties/list', label: 'List Property' },
+      { href: '/properties/personal', label: 'My Properties' }
+    ] : [])
+  ]
 
   return (
     <motion.header
@@ -51,11 +63,11 @@ const Header: React.FC = () => {
             </motion.button>
           </div>
           <nav className="hidden md:flex space-x-10">
-            <NavLink href="/">Home</NavLink>
-            <NavLink href="/properties">Properties</NavLink>
-            <NavLink href="/properties/list">List Property</NavLink>
-            <NavLink href="/properties/realtors">Realtors</NavLink>
-            <NavLink href="/properties/personal">My Properties</NavLink>
+            {navLinks.map((link) => (
+              <NavLink key={link.href} href={link.href}>
+                {link.label}
+              </NavLink>
+            ))}
           </nav>
           <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
             <ConnectBtn networks />
@@ -94,11 +106,11 @@ const Header: React.FC = () => {
                 </div>
                 <div className="mt-6">
                   <nav className="grid gap-y-8">
-                    <NavLink href="/">Home</NavLink>
-                    <NavLink href="/properties">Properties</NavLink>
-                    <NavLink href="/properties/list">List Property</NavLink>
-                    <NavLink href="/properties/realtors">Realtors</NavLink>
-                    <NavLink href="/properties/personal">My Properties</NavLink>
+                    {navLinks.map((link) => (
+                      <NavLink key={link.href} href={link.href} mobile>
+                        {link.label}
+                      </NavLink>
+                    ))}
                   </nav>
                 </div>
               </div>
