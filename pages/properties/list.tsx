@@ -4,6 +4,7 @@ import { NextPage } from 'next'
 import React, { ChangeEvent, FormEvent, useState } from 'react'
 import { toast } from 'react-toastify'
 import { useAccount } from 'wagmi'
+import Image from 'next/image'
 
 const Page: NextPage = () => {
   const { address } = useAccount()
@@ -238,7 +239,7 @@ const Page: NextPage = () => {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                   {property.images.map((image, index) => (
                     <div key={index} className="relative group">
-                      <img
+                      <Image
                         src={image}
                         alt={`Property ${index + 1}`}
                         className="w-full h-48 object-cover rounded-lg"

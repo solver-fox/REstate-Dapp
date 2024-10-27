@@ -4,6 +4,7 @@ import { PropertyParams } from '@/utils/type.dt'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/router'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 
 interface EditPropertyProps {
   propertyId: number
@@ -15,7 +16,7 @@ const EditProperty: React.FC<EditPropertyProps> = ({ propertyId }) => {
   const [property, setProperty] = useState<PropertyParams>({
     id: propertyId,
     name: '',
-    images: [],
+    images: [], // This array needs to be handled carefully
     category: 'House',
     description: '',
     location: '',
@@ -185,18 +186,22 @@ const EditProperty: React.FC<EditPropertyProps> = ({ propertyId }) => {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                   {property.images.map((image, index) => (
                     <div key={index} className="relative group">
-                      <img
+                      <Image
                         src={image}
                         alt={`Property ${index + 1}`}
+                        width={500}
+                        height={300}
                         className="w-full h-48 object-cover rounded-lg"
                       />
                       <button
                         type="button"
                         onClick={() => {
-                          setProperty((prev) => ({
+                          const newImages = [...property.images];
+                          newImages.splice(index, 1);
+                          setProperty(prev => ({
                             ...prev,
-                            images: prev.images.filter((_, i) => i !== index),
-                          }))
+                            images: newImages
+                          }));
                         }}
                         className="absolute top-2 right-2 bg-red-500 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                       >
