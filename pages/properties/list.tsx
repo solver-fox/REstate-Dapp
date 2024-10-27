@@ -25,15 +25,25 @@ const Page: NextPage = () => {
     price: '',
   })
 
-  // Add a new state for the image input
+ 
   const [imageInput, setImageInput] = useState<string>('');
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+ 
+  const [errors, setErrors] = useState<{ [key in keyof PropertyParams]?: string }>({});
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setProperty((prevState) => ({
       ...prevState,
       [name]: value,
     }))
+   
+    if (errors[name as keyof PropertyParams]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: undefined
+      }));
+    }
   }
 
 
@@ -41,10 +51,39 @@ const Page: NextPage = () => {
     e.preventDefault()
     if (!address) return toast.warn('Please connect your wallet')
 
-    // Log the images to debug
+  
+    const requiredFields: (keyof PropertyParams)[] = [
+      'name', 'category', 'description', 'location', 'city',
+      'state', 'country', 'zipCode', 'bedroom', 'bathroom',
+      'built', 'squarefit', 'price'
+    ];
+
+    const newErrors: { [key in keyof PropertyParams]?: string } = {};
+    requiredFields.forEach(field => {
+      if (!property[field]) {
+        newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
+      }
+    });
+
+    
+    if (property.images.length === 0) {
+      newErrors.images = 'At least one image is required';
+    }
+
+   
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+ 
+    setErrors({});
+
+
     console.log('Images:', property.images);
 
-    // Check if images are provided
+    
     if (property.images.length === 0 || property.images.some(image => !image.trim())) {
         return toast.warn('Please provide at least one valid image URL')
     }
@@ -52,12 +91,12 @@ const Page: NextPage = () => {
     await toast.promise(
       new Promise(async (resolve, reject) => {
         try {
-          const tx = await createProperty(property) // Ensure we await the createProperty function
+          const tx = await createProperty(property) 
           console.log(tx)
           resetForm()
           resolve(tx)
         } catch (error) {
-          reject(error) // Handle error properly
+          reject(error) 
         }
       }),
       {
@@ -127,25 +166,31 @@ const Page: NextPage = () => {
                     value={property.name}
                     onChange={handleChange}
                     placeholder="Property Name"
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
-                    required 
+                    className={`w-full px-4 py-3 bg-gray-800 border ${
+                      errors.name ? 'border-red-500' : 'border-gray-700'
+                    } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
+                    required
                   />
+                  {errors.name && (
+                    <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+                  )}
                 </div>
 
                 <div className="group">
-                  <select
+                  <input
+                    type="text"
                     name="category"
                     value={property.category}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
+                    placeholder="Category (e.g., Apartment, House)"
+                    className={`w-full px-4 py-3 bg-gray-800 border ${
+                      errors.category ? 'border-red-500' : 'border-gray-700'
+                    } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
                     required
-                  >
-                    <option value="House">House</option>
-                    <option value="Apartment">Apartment</option>
-                    <option value="Condo">Condo</option>
-                    <option value="Townhouse">Townhouse</option>
-                    <option value="Villa">Villa</option>
-                  </select>
+                  />
+                  {errors.category && (
+                    <p className="mt-1 text-sm text-red-500">{errors.category}</p>
+                  )}
                 </div>
               </div>
 
@@ -155,9 +200,14 @@ const Page: NextPage = () => {
                 onChange={handleChange}
                 placeholder="Property Description"
                 rows={4}
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 hover:border-blue-500"
-                required 
+                className={`w-full px-4 py-3 bg-gray-800 border ${
+                  errors.description ? 'border-red-500' : 'border-gray-700'
+                } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 hover:border-blue-500`}
+                required
               />
+              {errors.description && (
+                <p className="mt-1 text-sm text-red-500">{errors.description}</p>
+              )}
             </div>
 
             {/* Property Images */}
@@ -212,8 +262,8 @@ const Page: NextPage = () => {
                 <input
                   type="url"
                   placeholder="Enter image URL"
-                  value={imageInput} // Bind the input value to the state
-                  onChange={(e) => setImageInput(e.target.value)} // Update state on change
+                  value={imageInput} 
+                  onChange={(e) => setImageInput(e.target.value)} 
                   className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 hover:border-blue-500"
                 />
                 <button
@@ -222,10 +272,10 @@ const Page: NextPage = () => {
                     if (imageInput.trim()) {
                       setProperty((prev) => {
                         const newImages = [...prev.images, imageInput.trim()];
-                        console.log('Updated Images:', newImages); // Log updated images
+                        console.log('Updated Images:', newImages);
                         return { ...prev, images: newImages };
                       });
-                      setImageInput(''); // Clear the input after adding
+                      setImageInput(''); 
                     }
                   }}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -251,9 +301,14 @@ const Page: NextPage = () => {
                   value={property.bedroom}
                   onChange={handleChange}
                   placeholder="Bedrooms"
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
-                  required 
+                  className={`w-full px-4 py-3 bg-gray-800 border ${
+                    errors.bedroom ? 'border-red-500' : 'border-gray-700'
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
+                  required
                 />
+                {errors.bedroom && (
+                  <p className="mt-1 text-sm text-red-500">{errors.bedroom}</p>
+                )}
 
                 <input
                   type="number"
@@ -261,9 +316,14 @@ const Page: NextPage = () => {
                   value={property.bathroom}
                   onChange={handleChange}
                   placeholder="Bathrooms"
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
-                  required 
+                  className={`w-full px-4 py-3 bg-gray-800 border ${
+                    errors.bathroom ? 'border-red-500' : 'border-gray-700'
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
+                  required
                 />
+                {errors.bathroom && (
+                  <p className="mt-1 text-sm text-red-500">{errors.bathroom}</p>
+                )}
 
                 <input
                   type="number"
@@ -271,9 +331,14 @@ const Page: NextPage = () => {
                   value={property.squarefit}
                   onChange={handleChange}
                   placeholder="Square Feet"
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
-                  required 
+                  className={`w-full px-4 py-3 bg-gray-800 border ${
+                    errors.squarefit ? 'border-red-500' : 'border-gray-700'
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
+                  required
                 />
+                {errors.squarefit && (
+                  <p className="mt-1 text-sm text-red-500">{errors.squarefit}</p>
+                )}
               </div>
             </div>
 
@@ -293,9 +358,14 @@ const Page: NextPage = () => {
                   value={property.location}
                   onChange={handleChange}
                   placeholder="Street Address"
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
-                  required 
+                  className={`w-full px-4 py-3 bg-gray-800 border ${
+                    errors.location ? 'border-red-500' : 'border-gray-700'
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
+                  required
                 />
+                {errors.location && (
+                  <p className="mt-1 text-sm text-red-500">{errors.location}</p>
+                )}
 
                 <input
                   type="text"
@@ -303,9 +373,14 @@ const Page: NextPage = () => {
                   value={property.city}
                   onChange={handleChange}
                   placeholder="City"
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
-                  required 
+                  className={`w-full px-4 py-3 bg-gray-800 border ${
+                    errors.city ? 'border-red-500' : 'border-gray-700'
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
+                  required
                 />
+                {errors.city && (
+                  <p className="mt-1 text-sm text-red-500">{errors.city}</p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -315,9 +390,14 @@ const Page: NextPage = () => {
                   value={property.state}
                   onChange={handleChange}
                   placeholder="State"
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
-                  required 
+                  className={`w-full px-4 py-3 bg-gray-800 border ${
+                    errors.state ? 'border-red-500' : 'border-gray-700'
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
+                  required
                 />
+                {errors.state && (
+                  <p className="mt-1 text-sm text-red-500">{errors.state}</p>
+                )}
 
                 <input
                   type="text"
@@ -325,9 +405,14 @@ const Page: NextPage = () => {
                   value={property.country}
                   onChange={handleChange}
                   placeholder="Country"
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
-                  required 
+                  className={`w-full px-4 py-3 bg-gray-800 border ${
+                    errors.country ? 'border-red-500' : 'border-gray-700'
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
+                  required
                 />
+                {errors.country && (
+                  <p className="mt-1 text-sm text-red-500">{errors.country}</p>
+                )}
 
                 <input
                   type="text"
@@ -335,9 +420,14 @@ const Page: NextPage = () => {
                   value={property.zipCode}
                   onChange={handleChange}
                   placeholder="Zip Code"
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
-                  required 
+                  className={`w-full px-4 py-3 bg-gray-800 border ${
+                    errors.zipCode ? 'border-red-500' : 'border-gray-700'
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
+                  required
                 />
+                {errors.zipCode && (
+                  <p className="mt-1 text-sm text-red-500">{errors.zipCode}</p>
+                )}
               </div>
             </div>
 
@@ -357,9 +447,14 @@ const Page: NextPage = () => {
                   value={property.built}
                   onChange={handleChange}
                   placeholder="Year Built"
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
-                  required 
+                  className={`w-full px-4 py-3 bg-gray-800 border ${
+                    errors.built ? 'border-red-500' : 'border-gray-700'
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
+                  required
                 />
+                {errors.built && (
+                  <p className="mt-1 text-sm text-red-500">{errors.built}</p>
+                )}
 
                 <input
                   type="number"
@@ -367,9 +462,14 @@ const Page: NextPage = () => {
                   value={property.price}
                   onChange={handleChange}
                   placeholder="Price (in ETH)"
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500"
-                  required 
+                  className={`w-full px-4 py-3 bg-gray-800 border ${
+                    errors.price ? 'border-red-500' : 'border-gray-700'
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300 group-hover:border-blue-500`}
+                  required
                 />
+                {errors.price && (
+                  <p className="mt-1 text-sm text-red-500">{errors.price}</p>
+                )}
               </div>
             </div>
 

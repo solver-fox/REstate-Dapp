@@ -180,9 +180,20 @@ const buyProperty = async (property: PropertyStruct): Promise<void> => {
 }
 
 const getProperty = async (id: number): Promise<PropertyStruct> => {
-  const contract = await getEthereumContract()
-  const property = await contract.getProperty(id)
-  return propertyStructure([property])[0]
+  if (!ethereum) {
+    reportError('Please install a wallet provider')
+    return Promise.reject(new Error('Browser provider not found'))
+  }
+  try {
+    const contract = await getEthereumContract()
+    const property = await contract.getProperty(id)
+    console.log('Fetched property:', property)
+    return propertyStructure([property])[0]
+  } catch (error) {
+    console.error('Error in getProperty:', error)
+    reportError(error)
+    return Promise.reject(error)
+  }
 }
 
 const getAllProperties = async (): Promise<PropertyStruct[]> => {
