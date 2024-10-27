@@ -219,21 +219,27 @@ const PropertyDetails = () => {
 
   return (
     <div className="min-h-screen bg-black text-gray-100">
-      <div className="relative h-[50vh] sm:h-[70vh] w-full"> {/* Reduced height on mobile */}
+      {/* Update the image container height and responsiveness */}
+      <div className="relative w-full" style={{ height: '50vh' }}> {/* Changed from h-[50vh] for better mobile support */}
         <Image
           src={property?.images[selectedImage] || ''}
           alt={property?.name}
           layout="fill"
           objectFit="cover"
+          priority // Add priority to ensure faster loading of hero image
           className="brightness-50"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+        
+        {/* Update gradient overlay for better visibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8"> {/* Reduced padding on mobile */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8">
           <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2 sm:gap-4"> {/* Reduced gap on mobile */}
               <div>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">{property?.name}</h1>
+                <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-1 sm:mb-2">
+                  {property?.name}
+                </h1>
                 <div className="flex flex-wrap items-center gap-4 text-sm sm:text-base text-gray-300">
                   <span className="flex items-center">
                     <BiMap className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
@@ -259,7 +265,7 @@ const PropertyDetails = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12">
         {/* Property Stats - Update grid layout */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8 sm:mb-12">
           <PropertyStat icon={<BiBed />} value={property?.bedroom} label="Bedrooms" />
