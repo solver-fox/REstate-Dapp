@@ -5,8 +5,9 @@ import { BiEdit, BiTrash } from 'react-icons/bi'
 
 interface PropertyActionsProps {
   propertyId: number
-  isOwner: boolean | undefined | null  // Updated type to handle potential undefined/null
+  isOwner: boolean
   isSold: boolean
+  onBuy: () => Promise<void>
 }
 
 const PropertyActions: React.FC<PropertyActionsProps> = ({ propertyId, isOwner, isSold }) => {
