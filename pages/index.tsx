@@ -1,4 +1,5 @@
 import Hero from '@/components/Hero'
+import Features from '@/components/Features'
 import { getAllProperties } from '@/services/blockchain'
 import { PropertyStruct } from '@/utils/type.dt'
 import { NextPage } from 'next'
@@ -6,7 +7,7 @@ import Head from 'next/head'
 import React, { useEffect, useState } from 'react'
 import PropertyList from '@/components/PropertyList'
 
-const AllPropertyPage: NextPage = () => {
+const HomePage: NextPage = () => {
   const [properties, setProperties] = useState<PropertyStruct[]>([])
 
   useEffect(() => {
@@ -20,16 +21,19 @@ const AllPropertyPage: NextPage = () => {
   return (
     <div className="bg-black min-h-screen">
       <Head>
-        <title>Hemproperty | All Properties</title>
+        <title>HemProp | Web3 Real Estate Marketplace</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="">
+      <main>
         <Hero />
-        <PropertyList properties={properties} /> {/* Pass properties here */}
+        <PropertyList properties={properties} />
+        <Features />
+       
+       
       </main>
     </div>
   )
 }
 
-export default AllPropertyPage
+export default HomePage
