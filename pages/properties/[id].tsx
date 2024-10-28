@@ -218,7 +218,7 @@ const PropertyDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-gray-100">
+    <div className="min-h-screen bg-black text-gray-100 pb-[100px] lg:pb-0">
       {/* Update the image container height and responsiveness */}
       <div className="relative w-full" style={{ height: '50vh' }}> {/* Changed from h-[50vh] for better mobile support */}
         <Image
@@ -393,8 +393,8 @@ const PropertyDetails = () => {
           {/* Right Column */}
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-6">
-              {/* Property Actions */}
-              <div className="bg-gray-900 rounded-2xl p-6 space-y-4">
+           
+              <div className="bg-gray-900 rounded-2xl p-6 space-y-4 lg:relative fixed bottom-0 left-0 right-0 lg:bottom-auto lg:left-auto lg:right-auto z-40 lg:z-auto">
                 {!isOwner && !property?.sold && (
                   <button
                     onClick={handleBuyProperty}
@@ -438,7 +438,7 @@ const PropertyDetails = () => {
                 )}
               </div>
 
-              {/* Add Delete Confirmation Modal */}
+      
               <AnimatePresence>
                 {showDeleteModal && (
                   <motion.div

@@ -7,6 +7,10 @@ module.exports = {
     sepolia: {
       url: process.env.NEXT_PUBLIC_RPC_URL,
       accounts: [process.env.PRIVATE_KEY],
+      chainId: 11155111,
+    },
+    hardhat: {
+      chainId: 31337,
     },
   },
   solidity: {
@@ -18,6 +22,9 @@ module.exports = {
       },
       viaIR: true,
     },
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
   mocha: {
     timeout: 40000,
