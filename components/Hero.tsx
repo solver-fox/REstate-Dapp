@@ -30,7 +30,7 @@ const Hero = () => {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                href={'/properties/list'}
+                href={'/properties'}
                 className="px-8 py-4 bg-blue-500 backdrop-blur-sm text-white font-semibold rounded-md hover:bg-gray-700 hover:scale-105 transition-all duration-200 active:scale-95 text-center"
               >
                 Explore Properties
