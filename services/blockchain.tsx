@@ -2,7 +2,6 @@ import { ethers, id } from 'ethers'
 import address from '@/contracts/contractAddress.json'
 import abi from '@/artifacts/contracts/HemProp.sol/HemProp.json'
 import { PropertyParams, PropertyStruct, ReviewParams, ReviewStruct } from '@/utils/type.dt'
-import { toast } from 'react-toastify'
 
 const toWei = (num: number) => ethers.parseEther(num.toString())
 const fromWei = (num: string | number | null): string => {
@@ -15,60 +14,34 @@ const fromWei = (num: string | number | null): string => {
 let ethereum: any
 let tx: any
 
-if (typeof window != 'undefined') ethereum = (window as any).ethereum
-
-const checkWalletAvailability = (): string => {
-  if (typeof window === 'undefined') return 'Browser environment required'
-  if (!window.ethereum) return 'No wallet detected'
-  if (window.ethereum.isTrustWallet) return 'trustwallet'
-  return 'ethereum'
-}
+if (typeof window !== 'undefined') ethereum = (window as any).ethereum
 
 const getEthereumContract = async () => {
-  try {
-    const walletStatus = checkWalletAvailability()
-    if (walletStatus !== 'ethereum' && walletStatus !== 'trustwallet') {
-      throw new Error(walletStatus || 'No wallet detected')
-    }
+  const accounts = await ethereum?.request?.({ method: 'eth_accounts' })
 
-    const accounts = await ethereum?.request?.({ method: 'eth_accounts' })
+  if (accounts?.length > 0) {
+    const provider = new ethers.BrowserProvider(ethereum)
+    const signer = await provider.getSigner()
+    const contracts = new ethers.Contract(address.HemProp, abi.abi, signer)
 
-    if (accounts?.length > 0) {
-      const provider = new ethers.BrowserProvider(ethereum)
-      const signer = await provider.getSigner()
-      return new ethers.Contract(address.HemProp, abi.abi, signer)
-    } else {
-      // For read-only operations
-      const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL)
-      return new ethers.Contract(address.HemProp, abi.abi, provider)
-    }
-  } catch (error) {
-    console.error('Contract connection error:', error)
-    throw error
+    return contracts
+  } else {
+    const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL)
+    const contracts = new ethers.Contract(address.HemProp, abi.abi, provider)
+
+    return contracts
   }
 }
 
 // Create Property
 const createProperty = async (property: PropertyParams): Promise<void> => {
+  if (!ethereum) {
+    reportError('Please install a wallet provider')
+    return Promise.reject(new Error('Browser provider not found'))
+  }
   try {
-    // Check if we're on mobile and have a wallet
-    if (typeof window !== 'undefined' && !window.ethereum) {
-      throw new Error('Please install a mobile web3 wallet like MetaMask or Trust Wallet')
-    }
-
-    // Validate property data before submission
-    if (!property.name || !property.images.length) {
-      throw new Error('Please fill in all required fields')
-    }
-
     const contract = await getEthereumContract()
-    if (!contract) {
-      throw new Error('Unable to connect to blockchain. Please check your wallet connection')
-    }
-
-    console.log('Creating property with data:', property) // Debug log
-
-    const tx = await contract.createProperty(
+    tx = await contract.createProperty(
       property.name,
       property.images,
       property.category,
@@ -84,28 +57,11 @@ const createProperty = async (property: PropertyParams): Promise<void> => {
       property.squarefit,
       toWei(Number(property.price))
     )
-
-    console.log('Transaction initiated:', tx) // Debug log
-
-    const receipt = await tx.wait()
-    console.log('Transaction completed:', receipt) // Debug log
-
+    await tx.wait()
     return Promise.resolve(tx)
-  } catch (error: any) {
-    // Provide more specific error messages
-    let errorMessage = 'Failed to create property'
-
-    if (error.message.includes('user rejected')) {
-      errorMessage = 'Transaction was rejected in wallet'
-    } else if (error.message.includes('insufficient funds')) {
-      errorMessage = 'Insufficient funds for gas fee'
-    } else if (error.message.includes('Price must be greater than zero')) {
-      errorMessage = 'Property price must be greater than 0 ETH'
-    }
-
-    console.error('Property creation error:', error)
-    toast.error(errorMessage)
-    return Promise.reject(errorMessage)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
   }
 }
 

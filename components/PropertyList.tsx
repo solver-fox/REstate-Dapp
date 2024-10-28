@@ -174,7 +174,7 @@ const PropertyList: React.FC<{ properties: PropertyStruct[] }> = ({ properties }
             transition={{ duration: 0.5 }}
             className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 mb-4 md:mb-0"
           >
-            Featured Properties
+            Properties
           </motion.h2>
           
           <div className="flex flex-wrap items-center gap-4">
