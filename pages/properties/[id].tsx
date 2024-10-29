@@ -29,9 +29,7 @@ import {
 } from 'react-icons/bi'
 import { FaEthereum } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
-import PropertyActions from '@/components/PropertyActions'
 import Image from 'next/image'
-import { formatEther } from 'viem'
 
 const PropertyDetails = () => {
   const router = useRouter()
@@ -66,8 +64,6 @@ const PropertyDetails = () => {
       setLoading(true)
       try {
         const propertyId = Array.isArray(id) ? Number(id[0]) : Number(id)
-        
-        // Fetch property data without requiring wallet connection
         try {
           const fetchedProperty = await getProperty(propertyId)
           if (!fetchedProperty) {
@@ -78,10 +74,9 @@ const PropertyDetails = () => {
           console.error('Error fetching property:', propertyError)
           toast.error(propertyError.message || 'Failed to load property details')
           setProperty(null)
-          return // Exit early if property fetch fails
+          return
         }
 
-        // Fetch reviews without requiring wallet connection
         try {
           const fetchedReviews = await getAllReviews(propertyId)
           setReviews(fetchedReviews)
@@ -90,7 +85,6 @@ const PropertyDetails = () => {
           toast.error('Failed to load reviews, but property details are available')
           setReviews([])
         }
-
       } finally {
         setLoading(false)
       }
@@ -513,7 +507,14 @@ const PropertyDetails = () => {
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-6">
               <div className="bg-gray-900 rounded-2xl p-6 space-y-4 mb-20 lg:mb-0">
-                {!isOwner && !property?.sold && (
+                {!address ? (
+                  <button
+                    onClick={() => router.push('/connect')} // Adjust this to your wallet connection logic
+                    className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <span>Connect Wallet</span>
+                  </button>
+                ) : !isOwner && !property?.sold && (
                   <button
                     onClick={handleBuyProperty}
                     className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2"
@@ -656,6 +657,26 @@ const PropertyDetails = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Add this fixed mobile button container at the bottom of the component, just before the final closing div */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-gray-900 border-t border-gray-800">
+        {!address ? (
+          <button
+            onClick={() => router.push('/connect')} // Adjust this to your wallet connection logic
+            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2"
+          >
+            <span>Connect Wallet</span>
+          </button>
+        ) : !isOwner && !property?.sold && (
+          <button
+            onClick={handleBuyProperty}
+            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2"
+          >
+            <FaEthereum className="w-5 h-5" />
+            <span>Buy for {property?.price} ETH</span>
+          </button>
+        )}
+      </div>
     </div>
   )
 }
