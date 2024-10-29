@@ -167,18 +167,9 @@ const PropertyList: React.FC<{ properties: PropertyStruct[] }> = ({ properties }
   }
 
   return (
-    <section className="pt-24 pb-16 bg-black min-h-screen">
+    <section className="pt-24 pb-16 min-h-screen">
       <main className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-          <motion.h2
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600 mb-4 md:mb-0"
-          >
-            Properties
-          </motion.h2>
-          
+        <div className="flex justify-end mb-8">
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center space-x-2 bg-zinc-900 border border-zinc-800 rounded-lg p-2">
               <button
