@@ -12,9 +12,12 @@ const PropertiesPage = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true)
+        console.log('Fetching properties...')
         const fetchedProperties: PropertyStruct[] = await getAllProperties()
+        console.log('Fetched properties:', fetchedProperties)
         setProperties(fetchedProperties)
       } catch (err) {
+        console.error('Error fetching properties:', err)
         setError(err instanceof Error ? err.message : 'Failed to fetch properties')
       } finally {
         setIsLoading(false)
