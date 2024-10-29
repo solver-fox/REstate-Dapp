@@ -199,7 +199,7 @@ const PropertyDetails = () => {
         <div className="text-center max-w-md">
           <h2 className="text-xl font-semibold text-red-500 mb-2">Property Not Found</h2>
           <p className="text-gray-400 mb-4">
-            We couldn't find the property you're looking for. It may have been removed or doesn't exist.
+            We couldn&apos;t find the property you&apos;re looking for. It may have been removed or doesn&apos;t exist.
           </p>
           <button
             onClick={() => router.push('/properties')}
