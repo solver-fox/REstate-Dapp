@@ -184,10 +184,10 @@ const PropertyDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center">
-        <div className="space-y-4 text-center">
-          <div className="w-16 h-16 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin mx-auto" />
-          <p className="text-gray-400">Loading property details...</p>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-400">Loading property details...</p>
         </div>
       </div>
     )
@@ -195,20 +195,17 @@ const PropertyDetails = () => {
 
   if (!property) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex flex-col items-center justify-center p-4">
-        <div className="max-w-md w-full text-center space-y-6">
-          <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mx-auto">
-            <BiBuilding className="w-12 h-12 text-gray-400" />
-          </div>
-          <h1 className="text-3xl font-bold text-white">Property Not Found</h1>
-          <p className="text-gray-400">
-            The property you&apos;re looking for doesn&apos;t exist or has been removed.
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <h2 className="text-xl font-semibold text-red-500 mb-2">Property Not Found</h2>
+          <p className="text-gray-400 mb-4">
+            We couldn't find the property you're looking for. It may have been removed or doesn't exist.
           </p>
           <button
             onClick={() => router.push('/properties')}
-            className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all"
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Browse Properties
+            View All Properties
           </button>
         </div>
       </div>

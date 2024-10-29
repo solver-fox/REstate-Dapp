@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { BsGrid, BsList, BsFilter } from 'react-icons/bs'
 import { BiBed, BiBath, BiArea, BiMap } from 'react-icons/bi'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 interface PropertyCardProps {
   property: PropertyStruct
@@ -11,16 +12,17 @@ interface PropertyCardProps {
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode }) => {
+  const router = useRouter()
+
+  const handlePropertyClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    router.push(`/properties/${property.id}`)
+  }
+
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className={`bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all duration-300 ${
-        viewMode === 'list' ? 'flex' : ''
-      }`}
+    <div 
+      onClick={handlePropertyClick}
+      className="cursor-pointer bg-gray-900 rounded-2xl overflow-hidden border border-gray-800 hover:border-blue-500/50 transition-all duration-300"
     >
       <div className={`relative ${viewMode === 'list' ? 'w-1/3' : 'h-64'}`}>
         <img
@@ -80,7 +82,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode }) => {
           </Link>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
 

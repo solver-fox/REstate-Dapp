@@ -184,11 +184,25 @@ const getProperty = async (id: number): Promise<PropertyStruct> => {
     reportError('Please install a wallet provider')
     return Promise.reject(new Error('Browser provider not found'))
   }
+
+  if (!id || isNaN(id)) {
+    console.error('Invalid property ID:', id)
+    return Promise.reject(new Error('Invalid property ID'))
+  }
+
   try {
     const contract = await getEthereumContract()
+    console.log('Attempting to fetch property:', id)
     const property = await contract.getProperty(id)
-    console.log('Fetched property:', property)
-    return propertyStructure([property])[0]
+    
+    if (!property || !property.owner) {
+      console.error('Property not found or invalid data')
+      return Promise.reject(new Error('Property not found'))
+    }
+
+    const structuredProperty = propertyStructure([property])[0]
+    console.log('Successfully structured property:', structuredProperty)
+    return structuredProperty
   } catch (error) {
     console.error('Error in getProperty:', error)
     reportError(error)
