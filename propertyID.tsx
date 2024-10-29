@@ -62,22 +62,28 @@ const PropertyDetails = () => {
 
   useEffect(() => {
     const fetchPropertyAndReviews = async () => {
-      if (id) {
-        try {
-          const fetchedProperty = await getProperty(Number(id))
-          setProperty(fetchedProperty)
-          const fetchedReviews = await getAllReviews(Number(id))
-          setReviews(fetchedReviews)
-        } catch (error) {
-          console.error('Error fetching property or reviews:', error)
-          toast.error('Failed to load property details')
-        } finally {
-          setLoading(false)
+      if (!id) return;
+      
+      setLoading(true);
+      try {
+        const fetchedProperty = await getProperty(Number(id))
+        if (!fetchedProperty) {
+          throw new Error('Property not found')
         }
+        setProperty(fetchedProperty)
+        const fetchedReviews = await getAllReviews(Number(id))
+        setReviews(fetchedReviews)
+      } catch (error) {
+        console.error('Error fetching property or reviews:', error)
+        toast.error('Failed to load property details')
+      } finally {
+        setLoading(false)
       }
     }
 
-    fetchPropertyAndReviews()
+    if (id) {
+      fetchPropertyAndReviews()
+    }
   }, [id])
 
   const isOwner = address && property && address.toLowerCase() === property.owner.toLowerCase()
@@ -195,7 +201,7 @@ const PropertyDetails = () => {
     )
   }
 
-  if (!property) {
+  if (!loading && !property) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center max-w-md">
@@ -220,8 +226,8 @@ const PropertyDetails = () => {
       <div className="relative w-full" style={{ height: '50vh' }}>
         {' '}
         <Image
-          src={property?.images[selectedImage] || ''}
-          alt={property?.name}
+          src={property?.images[selectedImage] ?? ''}
+          alt={property?.name ?? 'Property Image'}
           layout="fill"
           objectFit="cover"
           priority
@@ -263,10 +269,10 @@ const PropertyDetails = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8 sm:mb-12">
-          <PropertyStat icon={<BiBed />} value={property?.bedroom} label="Bedrooms" />
-          <PropertyStat icon={<BiBath />} value={property?.bathroom} label="Bathrooms" />
-          <PropertyStat icon={<BiArea />} value={property?.squarefit} label="Square Feet" />
-          <PropertyStat icon={<BiBuilding />} value={property?.built} label="Year Built" />
+          <PropertyStat icon={<BiBed />} value={property?.bedroom ?? 0} label="Bedrooms" />
+          <PropertyStat icon={<BiBath />} value={property?.bathroom ?? 0} label="Bathrooms" />
+          <PropertyStat icon={<BiArea />} value={property?.squarefit ?? 0} label="Square Feet" />
+          <PropertyStat icon={<BiBuilding />} value={property?.built ?? 0} label="Year Built" />
         </div>
 
         {/* Content Grid */}
@@ -298,7 +304,7 @@ const PropertyDetails = () => {
                 ))}
 
                 {/* Show more photos button (if there are more than 8 images) */}
-                {property?.images.length > 8 && (
+                {(property?.images?.length ?? 0) > 8 && (
                   <div
                     className="relative aspect-square rounded-xl overflow-hidden cursor-pointer"
                     onClick={() => {
@@ -307,7 +313,7 @@ const PropertyDetails = () => {
                     }}
                   >
                     <Image
-                      src={property.images[8]}
+                      src={property?.images[8] ?? ''}
                       alt="More photos"
                       layout="fill"
                       objectFit="cover"
@@ -315,7 +321,7 @@ const PropertyDetails = () => {
                     />
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                       <span className="text-white text-lg font-semibold">
-                        +{property.images.length - 8} more
+                        +{(property?.images?.length ?? 0) - 8} more
                       </span>
                     </div>
                   </div>
@@ -588,7 +594,7 @@ const PropertyDetails = () => {
                 </svg>
               </button>
               <Image
-                src={property?.images[selectedImage]}
+                src={property?.images[selectedImage] ?? ''}
                 alt={`Property image ${selectedImage + 1}`}
                 width={1920}
                 height={1080}
@@ -646,14 +652,14 @@ const PropertyStat = ({
   label,
 }: {
   icon: React.ReactNode
-  value: string | number
+  value: string | number | undefined
   label: string
 }) => (
   <div className="bg-gray-900 rounded-xl p-3 sm:p-4">
     <div className="flex items-center gap-2 sm:gap-3">
       <div className="text-blue-400 text-lg sm:text-xl">{icon}</div>
       <div>
-        <div className="text-base sm:text-lg font-semibold">{value}</div>
+        <div className="text-base sm:text-lg font-semibold">{value ?? 0}</div>
         <div className="text-xs text-gray-400">{label}</div>
       </div>
     </div>
