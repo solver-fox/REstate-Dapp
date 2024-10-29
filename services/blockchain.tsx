@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
-import address from '@/contracts/contractAddress.json'
-import abi from '@/artifacts/contracts/HemProp.sol/HemProp.json'
-import { PropertyParams, PropertyStruct, ReviewParams, ReviewStruct } from '@/utils/type.dt'
+import address from '../contracts/contractAddress.json'
+import abi from '../artifacts/contracts/HemProp.sol/HemProp.json'
+import { PropertyParams, PropertyStruct, ReviewParams, ReviewStruct } from '../utils/type.dt'
 
 const toWei = (num: number) => ethers.parseEther(num.toString())
 const fromWei = (num: string | number | null): string => {

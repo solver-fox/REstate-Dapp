@@ -20,5 +20,5 @@
     "incremental": true
   },
   "exclude": ["node_modules"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "services/blockchain.jsx"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }
