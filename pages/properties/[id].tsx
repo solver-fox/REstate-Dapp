@@ -45,15 +45,13 @@ const PropertyDetails = () => {
   const [isLiked, setIsLiked] = useState(false)
   const [activeTab, setActiveTab] = useState('overview')
   const [isAdmin, setIsAdmin] = useState(false)
-  const [showModal, setShowModal] = useState(false) // New state for modal
-  const [showDeleteModal, setShowDeleteModal] = useState(false) // Add to existing states
+  const [showModal, setShowModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   // Check if the current user is an admin (you'll need to implement this logic)
   useEffect(() => {
-    // Example: Check if the address matches the contract owner
     const checkAdmin = async () => {
-      // Implement your admin check logic here
-      setIsAdmin(true) // Temporary for demonstration
+      setIsAdmin(true)
     }
     if (address) {
       checkAdmin()
@@ -219,23 +217,25 @@ const PropertyDetails = () => {
 
   return (
     <div className="min-h-screen bg-black text-gray-100 pb-[100px] lg:pb-0">
-      {/* Update the image container height and responsiveness */}
-      <div className="relative w-full" style={{ height: '50vh' }}> {/* Changed from h-[50vh] for better mobile support */}
+      
+      <div className="relative w-full" style={{ height: '50vh' }}>
+        {' '}
+      
         <Image
           src={property?.images[selectedImage] || ''}
           alt={property?.name}
           layout="fill"
           objectFit="cover"
-          priority // Add priority to ensure faster loading of hero image
+          priority 
           className="brightness-50"
         />
-        
-        {/* Update gradient overlay for better visibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
 
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8">
           <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col gap-2 sm:gap-4"> {/* Reduced gap on mobile */}
+            <div className="flex flex-col gap-2 sm:gap-4">
+              {' '}
+           
               <div>
                 <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-1 sm:mb-2">
                   {property?.name}
@@ -266,7 +266,7 @@ const PropertyDetails = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12">
-        {/* Property Stats - Update grid layout */}
+        
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8 sm:mb-12">
           <PropertyStat icon={<BiBed />} value={property?.bedroom} label="Bedrooms" />
           <PropertyStat icon={<BiBath />} value={property?.bathroom} label="Bathrooms" />
@@ -393,7 +393,6 @@ const PropertyDetails = () => {
           {/* Right Column */}
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-6">
-           
               <div className="bg-gray-900 rounded-2xl p-6 space-y-4 lg:relative fixed bottom-0 left-0 right-0 lg:bottom-auto lg:left-auto lg:right-auto z-40 lg:z-auto">
                 {!isOwner && !property?.sold && (
                   <button
@@ -438,7 +437,6 @@ const PropertyDetails = () => {
                 )}
               </div>
 
-      
               <AnimatePresence>
                 {showDeleteModal && (
                   <motion.div
