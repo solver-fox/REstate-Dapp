@@ -29,9 +29,8 @@ import {
 } from 'react-icons/bi'
 import { FaEthereum } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
-import PropertyActions from '../../components/PropertyActions'
 import Image from 'next/image'
-import { formatEther } from 'viem'
+
 
 const PropertyDetails = () => {
   const router = useRouter()

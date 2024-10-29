@@ -20,9 +20,16 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode }) => {
   }
 
   return (
-    <div 
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      whileHover={{ scale: 1.02 }}
       onClick={handlePropertyClick}
-      className="cursor-pointer bg-gray-900 rounded-2xl overflow-hidden border border-gray-800 hover:border-blue-500/50 transition-all duration-300"
+      className={`cursor-pointer bg-[#1A2331] rounded-2xl overflow-hidden border border-gray-800 hover:border-blue-500/50 transition-all duration-300 ${
+        viewMode === 'list' ? 'flex' : ''
+      }`}
     >
       <div className={`relative ${viewMode === 'list' ? 'w-1/3' : 'h-64'}`}>
         <img
@@ -30,9 +37,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode }) => {
           alt={property.name}
           className="w-full h-full object-cover transition-transform duration-300 ease-in-out hover:scale-105"
         />
-        <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold ${
-          property.sold ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
-        }`}>
+        <div
+          className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold ${
+            property.sold ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
+          }`}
+        >
           {property.sold ? 'Sold' : 'Available'}
         </div>
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
@@ -43,35 +52,40 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode }) => {
           </p>
         </div>
       </div>
-      
-      <div className={`p-6 ${viewMode === 'list' ? 'w-2/3' : ''}`}>
-        <div className="flex flex-wrap gap-4 mb-4">
-          <div className="flex items-center bg-gray-800 rounded-full px-3 py-1 transition-transform duration-200 ease-in-out hover:scale-105">
-            <BiBed className="mr-2 text-blue-400" />
-            <span className="text-sm text-gray-300">{property.bedroom} bedrooms</span>
-          </div>
-          <div className="flex items-center bg-gray-800 rounded-full px-3 py-1 transition-transform duration-200 ease-in-out hover:scale-105">
-            <BiBath className="mr-2 text-blue-400" />
-            <span className="text-sm text-gray-300">{property.bathroom} bathrooms</span>
-          </div>
-          <div className="flex items-center bg-gray-800 rounded-full px-3 py-1 transition-transform duration-200 ease-in-out hover:scale-105">
-            <BiArea className="mr-2 text-blue-400" />
-            <span className="text-sm text-gray-300">{property.squarefit.toLocaleString()} sqft</span>
-          </div>
-        </div>
 
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-sm text-gray-400">Listed by: 
-            <span className="font-mono bg-gray-800 px-2 py-1 rounded ml-2 inline-block">
-              {property.owner.slice(0, 6)}...{property.owner.slice(-4)}
+      <div className={`p-6 ${viewMode === 'list' ? 'w-2/3 flex flex-col justify-between' : ''}`}>
+        <div>
+          <div className="flex flex-wrap gap-4 mb-4">
+            <div className="flex items-center bg-gray-800 rounded-full px-3 py-1 transition-transform duration-200 ease-in-out hover:scale-105">
+              <BiBed className="mr-2 text-blue-400" />
+              <span className="text-sm text-gray-300">{property.bedroom} bedrooms</span>
+            </div>
+            <div className="flex items-center bg-gray-800 rounded-full px-3 py-1 transition-transform duration-200 ease-in-out hover:scale-105">
+              <BiBath className="mr-2 text-blue-400" />
+              <span className="text-sm text-gray-300">{property.bathroom} bathrooms</span>
+            </div>
+            <div className="flex items-center bg-gray-800 rounded-full px-3 py-1 transition-transform duration-200 ease-in-out hover:scale-105">
+              <BiArea className="mr-2 text-blue-400" />
+              <span className="text-sm text-gray-300">
+                {property.squarefit.toLocaleString()} sqft
+              </span>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-sm text-gray-400">
+              Listed by:
+              <span className="font-mono bg-gray-800 px-2 py-1 rounded ml-2 inline-block">
+                {property.owner.slice(0, 6)}...{property.owner.slice(-4)}
+              </span>
             </span>
-          </span>
-          <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-semibold">
-            {property.category}
-          </span>
+            <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-semibold">
+              {property.category}
+            </span>
+          </div>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mt-auto">
           <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">
             {property.price.toLocaleString()} ETH
           </span>
@@ -82,18 +96,18 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode }) => {
           </Link>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
 const PropertySkeleton: React.FC<{ viewMode: 'grid' | 'list' }> = ({ viewMode }) => {
   return (
-    <div className={`animate-pulse bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden ${
-      viewMode === 'list' ? 'flex' : ''
-    }`}>
-      <div className={`bg-zinc-800 ${
-        viewMode === 'list' ? 'w-1/3' : 'h-48'
-      }`} />
+    <div
+      className={`animate-pulse bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden ${
+        viewMode === 'list' ? 'flex' : ''
+      }`}
+    >
+      <div className={`bg-zinc-800 ${viewMode === 'list' ? 'w-1/3' : 'h-48'}`} />
       <div className={`p-6 ${viewMode === 'list' ? 'w-2/3' : ''}`}>
         <div className="h-6 bg-zinc-800 rounded w-3/4 mb-4" />
         <div className="h-4 bg-zinc-800 rounded w-1/2 mb-4" />
@@ -122,9 +136,9 @@ const PropertyList: React.FC<{ properties: PropertyStruct[] }> = ({ properties }
     maxPrice: '',
     minBedrooms: '',
     minBathrooms: '',
-    propertyType: ''
+    propertyType: '',
   })
-  
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false)
@@ -154,7 +168,7 @@ const PropertyList: React.FC<{ properties: PropertyStruct[] }> = ({ properties }
   }
 
   const applyFilters = () => {
-    let filtered = properties.filter(property => {
+    let filtered = properties.filter((property) => {
       if (filters.minPrice && property.price < parseFloat(filters.minPrice)) return false
       if (filters.maxPrice && property.price > parseFloat(filters.maxPrice)) return false
       if (filters.minBedrooms && property.bedroom < parseInt(filters.minBedrooms)) return false
@@ -174,18 +188,22 @@ const PropertyList: React.FC<{ properties: PropertyStruct[] }> = ({ properties }
             <div className="flex items-center space-x-2 bg-zinc-900 border border-zinc-800 rounded-lg p-2">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-2 rounded ${viewMode === 'grid' ? 'bg-blue-500/20 text-blue-400' : 'text-zinc-400'}`}
+                className={`p-2 rounded ${
+                  viewMode === 'grid' ? 'bg-blue-500/20 text-blue-400' : 'text-zinc-400'
+                }`}
               >
                 <BsGrid />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-2 rounded ${viewMode === 'list' ? 'bg-blue-500/20 text-blue-400' : 'text-zinc-400'}`}
+                className={`p-2 rounded ${
+                  viewMode === 'list' ? 'bg-blue-500/20 text-blue-400' : 'text-zinc-400'
+                }`}
               >
                 <BsList />
               </button>
             </div>
-            
+
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
@@ -268,31 +286,32 @@ const PropertyList: React.FC<{ properties: PropertyStruct[] }> = ({ properties }
         )}
 
         {loading ? (
-          <div className={`grid ${
-            viewMode === 'grid' 
-              ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'
-              : 'grid-cols-1 gap-4'
-          }`}>
+          <div
+            className={`grid ${
+              viewMode === 'grid'
+                ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'
+                : 'grid-cols-1 gap-6'
+            }`}
+          >
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <PropertySkeleton key={i} viewMode={viewMode} />
             ))}
           </div>
         ) : (
-          <AnimatePresence>
+          <AnimatePresence mode="wait">
             <motion.div
               layout
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               className={`grid ${
                 viewMode === 'grid'
                   ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'
-                  : 'grid-cols-1 gap-4'
+                  : 'grid-cols-1 gap-6'
               }`}
             >
               {sortProperties(filteredProperties).map((property) => (
-                <PropertyCard
-                  key={property.id}
-                  property={property}
-                  viewMode={viewMode}
-                />
+                <PropertyCard key={property.id} property={property} viewMode={viewMode} />
               ))}
             </motion.div>
           </AnimatePresence>
