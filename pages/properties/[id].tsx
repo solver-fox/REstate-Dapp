@@ -7,8 +7,8 @@ import {
   buyProperty,
   deleteReview,
   deleteProperty,
-} from '../../services/blockchain'
-import { PropertyStruct, ReviewStruct } from '../../utils/type.dt'
+} from '@/services/blockchain'
+import { PropertyStruct, ReviewStruct } from '@/utils/type.dt'
 import { useAccount } from 'wagmi'
 import { toast } from 'react-toastify'
 import {
@@ -29,7 +29,7 @@ import {
 } from 'react-icons/bi'
 import { FaEthereum } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
-import PropertyActions from '../../components/PropertyActions'
+import PropertyActions from '@/components/PropertyActions'
 import Image from 'next/image'
 import { formatEther } from 'viem'
 

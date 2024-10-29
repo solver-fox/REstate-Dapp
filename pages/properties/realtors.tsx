@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getAllProperties } from '../../services/blockchain'
+import { getAllProperties } from '@/services/blockchain'
 import { BiBuilding } from 'react-icons/bi'
 import Link from 'next/link'
 
