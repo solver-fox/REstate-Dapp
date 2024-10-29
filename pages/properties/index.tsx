@@ -31,7 +31,7 @@ const PropertiesPage = () => {
 
   return (
     <div className="container pt-24 pb-16 mx-auto px-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">Properties</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center"></h1>
       <PropertyList properties={properties} />
     </div>
   )
