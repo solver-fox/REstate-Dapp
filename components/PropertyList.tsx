@@ -48,11 +48,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode }) => {
         <div className="flex flex-wrap gap-4 mb-4">
           <div className="flex items-center bg-gray-800 rounded-full px-3 py-1 transition-transform duration-200 ease-in-out hover:scale-105">
             <BiBed className="mr-2 text-blue-400" />
-            <span className="text-sm text-gray-300">{property.bedroom} beds</span>
+            <span className="text-sm text-gray-300">{property.bedroom} bedrooms</span>
           </div>
           <div className="flex items-center bg-gray-800 rounded-full px-3 py-1 transition-transform duration-200 ease-in-out hover:scale-105">
             <BiBath className="mr-2 text-blue-400" />
-            <span className="text-sm text-gray-300">{property.bathroom} baths</span>
+            <span className="text-sm text-gray-300">{property.bathroom} bathrooms</span>
           </div>
           <div className="flex items-center bg-gray-800 rounded-full px-3 py-1 transition-transform duration-200 ease-in-out hover:scale-105">
             <BiArea className="mr-2 text-blue-400" />
