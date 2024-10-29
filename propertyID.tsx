@@ -491,7 +491,7 @@ const PropertyDetails = () => {
           {/* Right Column */}
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-6">
-              <div className="bg-gray-900 rounded-2xl p-6 space-y-4 lg:relative fixed bottom-0 left-0 right-0 lg:bottom-auto lg:left-auto lg:right-auto z-40 lg:z-auto">
+              <div className="bg-gray-900 rounded-2xl p-6 space-y-4 mb-20 lg:mb-0">
                 {!isOwner && !property?.sold && (
                   <button
                     onClick={handleBuyProperty}
@@ -537,7 +537,7 @@ const PropertyDetails = () => {
 
               {/* Owner Info */}
               {property?.owner && (
-                <div className="bg-gray-900 rounded-2xl p-6">
+                <div className="bg-gray-900 rounded-2xl p-6 hidden lg:block">
                   <h3 className="text-xl font-bold mb-4">Property Owner</h3>
                   <div className="flex items-center space-x-4">
                     <div className="w-12 h-12 bg-blue-600/20 rounded-full flex items-center justify-center">
