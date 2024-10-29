@@ -65,17 +65,23 @@ const PropertyDetails = () => {
 
       setLoading(true)
       try {
-        await new Promise((resolve) => setTimeout(resolve, 100))
-
         const propertyId = Array.isArray(id) ? Number(id[0]) : Number(id)
-        const fetchedProperty = await getProperty(propertyId)
-
-        if (!fetchedProperty) {
-          throw new Error('Property not found')
+        
+        // Fetch property data without requiring wallet connection
+        try {
+          const fetchedProperty = await getProperty(propertyId)
+          if (!fetchedProperty) {
+            throw new Error('Property not found')
+          }
+          setProperty(fetchedProperty)
+        } catch (propertyError: any) {
+          console.error('Error fetching property:', propertyError)
+          toast.error(propertyError.message || 'Failed to load property details')
+          setProperty(null)
+          return // Exit early if property fetch fails
         }
 
-        setProperty(fetchedProperty)
-        
+        // Fetch reviews without requiring wallet connection
         try {
           const fetchedReviews = await getAllReviews(propertyId)
           setReviews(fetchedReviews)
@@ -85,10 +91,6 @@ const PropertyDetails = () => {
           setReviews([])
         }
 
-      } catch (error: any) {
-        console.error('Error fetching property:', error)
-        toast.error(error.message || 'Failed to load property details')
-        setProperty(null)
       } finally {
         setLoading(false)
       }
@@ -97,7 +99,7 @@ const PropertyDetails = () => {
     if (id && id !== 'undefined') {
       fetchPropertyAndReviews()
     }
-  }, [id])
+  }, [id]) // Remove wallet-related dependencies
 
   const isOwner = address && property && address.toLowerCase() === property.owner.toLowerCase()
 
