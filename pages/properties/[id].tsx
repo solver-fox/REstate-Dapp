@@ -293,7 +293,6 @@ const PropertyDetails = () => {
                       objectFit="cover"
                       className="hover:scale-105 transition-transform duration-300"
                     />
-                    {/* Optional hover overlay */}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
                   </div>
                 ))}
