@@ -180,6 +180,11 @@ const buyProperty = async (property: PropertyStruct): Promise<void> => {
 }
 
 const getProperty = async (id: number): Promise<PropertyStruct> => {
+  if (!ethereum) {
+    reportError('Please install a wallet provider')
+    return Promise.reject(new Error('Browser provider not found'))
+  }
+
   if (!id || isNaN(id)) {
     console.error('Invalid property ID:', id)
     return Promise.reject(new Error('Invalid property ID'))

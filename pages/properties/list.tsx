@@ -30,7 +30,7 @@ const Page: NextPage = () => {
 
   const [errors, setErrors] = useState<{ [key in keyof PropertyParams]?: string }>({})
 
-  // Replace the houseTypes array with this one to match the types exactly
+ 
   const houseTypes = [
     'House',
     'Apartment',

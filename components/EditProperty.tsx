@@ -16,7 +16,7 @@ const EditProperty: React.FC<EditPropertyProps> = ({ propertyId }) => {
   const [property, setProperty] = useState<PropertyParams>({
     id: propertyId,
     name: '',
-    images: [], // This array needs to be handled carefully
+    images: [],
     category: 'House',
     description: '',
     location: '',
@@ -196,12 +196,12 @@ const EditProperty: React.FC<EditPropertyProps> = ({ propertyId }) => {
                       <button
                         type="button"
                         onClick={() => {
-                          const newImages = [...property.images];
-                          newImages.splice(index, 1);
-                          setProperty(prev => ({
+                          const newImages = [...property.images]
+                          newImages.splice(index, 1)
+                          setProperty((prev) => ({
                             ...prev,
-                            images: newImages
-                          }));
+                            images: newImages,
+                          }))
                         }}
                         className="absolute top-2 right-2 bg-red-500 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                       >
