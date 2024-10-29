@@ -7,8 +7,8 @@ import {
   buyProperty,
   deleteReview,
   deleteProperty,
-} from '@/services/blockchain'
-import { PropertyStruct, ReviewStruct } from '@/utils/type.dt'
+} from '../../services/blockchain'
+import { PropertyStruct, ReviewStruct } from '../../utils/type.dt'
 import { useAccount } from 'wagmi'
 import { toast } from 'react-toastify'
 import {
@@ -29,7 +29,9 @@ import {
 } from 'react-icons/bi'
 import { FaEthereum } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
+import PropertyActions from '../../components/PropertyActions'
 import Image from 'next/image'
+import { formatEther } from 'viem' // Add this import if not already present
 
 const PropertyDetails = () => {
   const router = useRouter()
@@ -63,28 +65,21 @@ const PropertyDetails = () => {
 
       setLoading(true)
       try {
+        await new Promise((resolve) => setTimeout(resolve, 100))
+
         const propertyId = Array.isArray(id) ? Number(id[0]) : Number(id)
-        try {
-          const fetchedProperty = await getProperty(propertyId)
-          if (!fetchedProperty) {
-            throw new Error('Property not found')
-          }
-          setProperty(fetchedProperty)
-        } catch (propertyError: any) {
-          console.error('Error fetching property:', propertyError)
-          toast.error(propertyError.message || 'Failed to load property details')
-          setProperty(null)
-          return
+        const fetchedProperty = await getProperty(propertyId)
+
+        if (!fetchedProperty) {
+          throw new Error('Property not found')
         }
 
-        try {
-          const fetchedReviews = await getAllReviews(propertyId)
-          setReviews(fetchedReviews)
-        } catch (reviewError) {
-          console.error('Error fetching reviews:', reviewError)
-          toast.error('Failed to load reviews, but property details are available')
-          setReviews([])
-        }
+        setProperty(fetchedProperty)
+        const fetchedReviews = await getAllReviews(propertyId)
+        setReviews(fetchedReviews)
+      } catch (error) {
+        console.error('Error fetching property or reviews:', error)
+        toast.error('Failed to load property details')
       } finally {
         setLoading(false)
       }
@@ -93,7 +88,7 @@ const PropertyDetails = () => {
     if (id && id !== 'undefined') {
       fetchPropertyAndReviews()
     }
-  }, [id]) // Remove wallet-related dependencies
+  }, [id])
 
   const isOwner = address && property && address.toLowerCase() === property.owner.toLowerCase()
 
@@ -277,6 +272,53 @@ const PropertyDetails = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12">
+        {/* Mobile Action Buttons */}
+        <div className="lg:hidden mb-6">
+          <div className="bg-gray-900 rounded-2xl p-6 space-y-4">
+            {!isOwner && !property?.sold && (
+              <button
+                onClick={handleBuyProperty}
+                className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2"
+              >
+                <FaEthereum className="w-5 h-5" />
+                <span>Buy for {property?.price} ETH</span>
+              </button>
+            )}
+
+            {isOwner && !property?.sold && (
+              <div className="space-y-3">
+                <div className="text-center py-2 px-4 bg-gray-800 rounded-xl">
+                  <p className="text-gray-400">You own this property</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={handleEditProperty}
+                    className="py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <BiEdit className="w-5 h-5" />
+                    <span>Edit</span>
+                  </button>
+
+                  <button
+                    onClick={() => setShowDeleteModal(true)}
+                    className="py-3 px-4 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <BiTrash className="w-5 h-5" />
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {!isOwner && property?.sold && (
+              <div className="text-center py-2 px-4 bg-gray-800 rounded-xl">
+                <p className="text-gray-400">This property has been sold</p>
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8 sm:mb-12">
           <PropertyStat icon={<BiBed />} value={property?.bedroom ?? 0} label="Bedrooms" />
           <PropertyStat icon={<BiBath />} value={property?.bathroom ?? 0} label="Bathrooms" />
@@ -506,15 +548,8 @@ const PropertyDetails = () => {
           {/* Right Column */}
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-6">
-              <div className="bg-gray-900 rounded-2xl p-6 space-y-4 mb-20 lg:mb-0">
-                {!address ? (
-                  <button
-                    onClick={() => router.push('/connect')} // Adjust this to your wallet connection logic
-                    className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2"
-                  >
-                    <span>Connect Wallet</span>
-                  </button>
-                ) : !isOwner && !property?.sold && (
+              <div className="hidden lg:block bg-gray-900 rounded-2xl p-6 space-y-4 mb-20 lg:mb-0">
+                {!isOwner && !property?.sold && (
                   <button
                     onClick={handleBuyProperty}
                     className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2"
@@ -657,26 +692,6 @@ const PropertyDetails = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Add this fixed mobile button container at the bottom of the component, just before the final closing div */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-gray-900 border-t border-gray-800">
-        {!address ? (
-          <button
-            onClick={() => router.push('/connect')} // Adjust this to your wallet connection logic
-            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2"
-          >
-            <span>Connect Wallet</span>
-          </button>
-        ) : !isOwner && !property?.sold && (
-          <button
-            onClick={handleBuyProperty}
-            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2"
-          >
-            <FaEthereum className="w-5 h-5" />
-            <span>Buy for {property?.price} ETH</span>
-          </button>
-        )}
-      </div>
     </div>
   )
 }
