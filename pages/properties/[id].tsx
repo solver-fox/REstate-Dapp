@@ -31,7 +31,6 @@ import { FaEthereum } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 
-
 const PropertyDetails = () => {
   const router = useRouter()
   const { id } = router.query
@@ -42,8 +41,6 @@ const PropertyDetails = () => {
   const [newReview, setNewReview] = useState('')
   const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState(0)
-  const [isLiked, setIsLiked] = useState(false)
-  const [activeTab, setActiveTab] = useState('overview')
   const [isAdmin, setIsAdmin] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -61,7 +58,6 @@ const PropertyDetails = () => {
   useEffect(() => {
     const fetchPropertyAndReviews = async () => {
       if (!id) return
-
       setLoading(true)
       try {
         await new Promise((resolve) => setTimeout(resolve, 100))
