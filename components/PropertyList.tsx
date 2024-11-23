@@ -107,18 +107,29 @@ const PropertySkeleton: React.FC<{ viewMode: 'grid' | 'list' }> = ({ viewMode })
         viewMode === 'list' ? 'flex' : ''
       }`}
     >
-      <div className={`bg-zinc-800 ${viewMode === 'list' ? 'w-1/3' : 'h-48'}`} />
+      <div 
+        className={`bg-zinc-800 ${
+          viewMode === 'list' 
+            ? 'w-1/3 h-[300px]' 
+            : 'h-[240px]'
+        }`} 
+      />
+
       <div className={`p-6 ${viewMode === 'list' ? 'w-2/3' : ''}`}>
-        <div className="h-6 bg-zinc-800 rounded w-3/4 mb-4" />
-        <div className="h-4 bg-zinc-800 rounded w-1/2 mb-4" />
-        <div className="flex space-x-4 mb-4">
-          <div className="h-4 bg-zinc-800 rounded w-16" />
-          <div className="h-4 bg-zinc-800 rounded w-16" />
-          <div className="h-4 bg-zinc-800 rounded w-16" />
+        <div className="flex flex-wrap gap-4 mb-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-8 bg-zinc-800 rounded-full w-24" />
+          ))}
         </div>
-        <div className="flex justify-between">
-          <div className="h-4 bg-zinc-800 rounded w-24" />
-          <div className="h-8 bg-zinc-800 rounded w-24" />
+
+        <div className="flex justify-between items-center mb-4">
+          <div className="h-4 bg-zinc-800 rounded w-32" />
+          <div className="h-6 bg-zinc-800 rounded w-20" />
+        </div>
+
+        <div className="flex justify-between items-center mt-4">
+          <div className="h-8 bg-zinc-800 rounded w-28" />
+          <div className="h-10 bg-zinc-800 rounded w-24" />
         </div>
       </div>
     </div>
