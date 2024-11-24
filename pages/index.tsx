@@ -29,7 +29,7 @@ const HomePage: NextPage = () => {
           <div className="max-w-3xl mx-auto text-center pt-32">
             <h1 className="text-4xl font-bold text-white mb-4">Discover Your Perfect Property</h1>
             <p className="text-gray-400 text-lg leading-relaxed">
-              Explore our curated collection of premium properties. Whether you're looking for a
+              Explore our curated collection of premium properties. Whether you&apos;re looking for a
               cozy apartment, a spacious family home, or a luxury estate.
             </p>
           </div>
