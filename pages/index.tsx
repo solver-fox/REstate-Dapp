@@ -23,6 +23,7 @@ const HomePage: NextPage = () => {
         <title>HemProp | Web3 Real Estate Marketplace</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      
       <main className="w-full mx-auto py-8">
         <Hero />
         <div className="px-4 sm:px-6 justify-center items-center lg:px-8 max-w-[1440px] mx-auto">
