@@ -148,7 +148,7 @@ contract HemProp is Ownable, ERC721, ReentrancyGuard {
     string[] memory images,
     string memory category,
     string memory description,
-    string memory location,a
+    string memory location,
     string memory city,
     string memory state,
     string memory country,
