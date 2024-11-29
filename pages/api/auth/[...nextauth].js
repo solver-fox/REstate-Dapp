@@ -32,7 +32,7 @@ export default async function auth(req, res) {
 
           if (result.success) {
             return {
-              id: siwe.address,
+              id: siwe.address,a
             }
           }
 
