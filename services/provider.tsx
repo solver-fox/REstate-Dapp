@@ -39,7 +39,7 @@ const wagmiConfig = createConfig({
 })
 
 const demoAppInfo = {
-  appName: 'HemProp',
+  appName: 'SlvfxProp',
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {

@@ -20,7 +20,7 @@ const HomePage: NextPage = () => {
   return (
     <div className="min-h-screen bg-gray-900">
       <Head>
-        <title>HemProp | Web3 Real Estate Marketplace</title>
+        <title>SlvfxProp | Web3 Real Estate Marketplace</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       

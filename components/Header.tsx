@@ -47,7 +47,7 @@ const Header: React.FC = () => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
               >
-                HemProp
+                SlvfxProp
               </motion.span>
             </Link>
           </div>
@@ -89,7 +89,7 @@ const Header: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <Link href={'/'} className="text-xl font-bold text-white">
-                      HemProp
+                      SlvfxProp
                     </Link>
                   </div>
                   <div className="-mr-2">

@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "HemProp",
-  "sourceName": "contracts/HemProp.sol",
+  "contractName": "SlvfxProp",
+  "sourceName": "contracts/SlvfxProp.sol",
   "abi": [
     {
       "inputs": [
@@ -521,7 +521,7 @@
               "type": "bool"
             }
           ],
-          "internalType": "struct HemProp.PropertyStruct[]",
+          "internalType": "struct SlvfxProp.PropertyStruct[]",
           "name": "myProperties",
           "type": "tuple[]"
         }
@@ -645,7 +645,7 @@
               "type": "bool"
             }
           ],
-          "internalType": "struct HemProp.PropertyStruct[]",
+          "internalType": "struct SlvfxProp.PropertyStruct[]",
           "name": "myProperties",
           "type": "tuple[]"
         }
@@ -696,7 +696,7 @@
               "type": "uint256"
             }
           ],
-          "internalType": "struct HemProp.ReviewStruct[]",
+          "internalType": "struct SlvfxProp.ReviewStruct[]",
           "name": "",
           "type": "tuple[]"
         }
@@ -807,7 +807,7 @@
               "type": "bool"
             }
           ],
-          "internalType": "struct HemProp.PropertyStruct",
+          "internalType": "struct SlvfxProp.PropertyStruct",
           "name": "",
           "type": "tuple"
         }
@@ -863,7 +863,7 @@
               "type": "uint256"
             }
           ],
-          "internalType": "struct HemProp.ReviewStruct",
+          "internalType": "struct SlvfxProp.ReviewStruct",
           "name": "",
           "type": "tuple"
         }
@@ -914,7 +914,7 @@
               "type": "uint256"
             }
           ],
-          "internalType": "struct HemProp.ReviewStruct[]",
+          "internalType": "struct SlvfxProp.ReviewStruct[]",
           "name": "",
           "type": "tuple[]"
         }

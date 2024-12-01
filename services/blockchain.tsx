@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import address from '../contracts/contractAddress.json'
-import abi from '../artifacts/contracts/HemProp.sol/HemProp.json'
+import abi from '../artifacts/contracts/SlvfxProp.sol/SlvfxProp.json'
 import { PropertyParams, PropertyStruct, ReviewParams, ReviewStruct } from '../utils/type.dt'
 
 const toWei = (num: number) => ethers.parseEther(num.toString())
@@ -22,12 +22,12 @@ const getEthereumContract = async () => {
   if (accounts?.length > 0) {
     const provider = new ethers.BrowserProvider(ethereum)
     const signer = await provider.getSigner()
-    const contracts = new ethers.Contract(address.HemProp, abi.abi, signer)
+    const contracts = new ethers.Contract(address.SlvfxProp, abi.abi, signer)
 
     return contracts
   } else {
     const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL)
-    const contracts = new ethers.Contract(address.HemProp, abi.abi, provider)
+    const contracts = new ethers.Contract(address.SlvfxProp, abi.abi, provider)
 
     return contracts
   }

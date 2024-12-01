@@ -6,7 +6,7 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
 
-contract HemProp is Ownable, ERC721, ReentrancyGuard {
+contract SlvfxProp is Ownable, ERC721, ReentrancyGuard {
   event PropertyCreated(uint256 indexed id, address indexed owner, uint256 price);
   event PropertyUpdated(uint256 indexed id);
   event PropertyDeleted(uint256 indexed id);

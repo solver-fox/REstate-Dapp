@@ -1,10 +1,10 @@
-// test/HemProp.test.js
+// test/SlvfxProp.test.js
 
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("HemProp Contract", function () {
-  let HemProp;
+describe("SlvfxProp Contract", function () {
+  let SlvfxProp;
   let hemProp;
   let owner;
   let addr1;
@@ -15,8 +15,8 @@ describe("HemProp Contract", function () {
     [owner, addr1, addr2] = await ethers.getSigners();
 
     // Deploy contract
-    HemProp = await ethers.getContractFactory("HemProp");
-    hemProp = await HemProp.deploy(5); // 5% service fee
+    SlvfxProp = await ethers.getContractFactory("SlvfxProp");
+    hemProp = await SlvfxProp.deploy(5); // 5% service fee
     await hemProp.waitForDeployment();
   });
 

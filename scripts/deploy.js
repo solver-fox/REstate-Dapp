@@ -8,12 +8,12 @@ async function main() {
     console.log('Deploying contract with the account:', deployer.address)
     console.log('Account balance:', (await ethers.provider.getBalance(deployer.address)).toString())
 
-    const HemProp = await ethers.getContractFactory('HemProp')
+    const SlvfxProp = await ethers.getContractFactory('SlvfxProp')
     console.log('Deploying Hemprop')
-    const hemprop = await HemProp.deploy(5)
-    await hemprop.waitForDeployment()
+    const slvfxprop = await SlvfxProp.deploy(5)
+    await slvfxprop.waitForDeployment()
 
-    console.log('HemProp deployed to:', await hemprop.getAddress())
+    console.log('SlvfxProp deployed to:', await slvfxprop.getAddress())
 
     //Save the contract address to contract folder
     const fs = require('fs')
@@ -25,7 +25,7 @@ async function main() {
 
     fs.writeFileSync(
       contractsDir + '/contractAddress.json',
-      JSON.stringify({ HemProp: await hemprop.getAddress() }, undefined, 2)
+      JSON.stringify({ SlvfxProp: await slvfxprop.getAddress() }, undefined, 2)
     )
     console.log('Contract address saved to contractAddress.json')
   } catch (error) {

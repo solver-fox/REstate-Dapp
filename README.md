@@ -1,6 +1,6 @@
-# HemProp - Decentralized Real Estate Marketplace
+# SlvfxProp - Decentralized Real Estate Marketplace
 
-HemProp is a decentralized application (dApp) built on the Ethereum blockchain that facilitates the buying, selling, and reviewing of real estate properties. This smart contract, written in Solidity, powers the core functionality of the HemProp platform.
+SlvfxProp is a decentralized application (dApp) built on the Ethereum blockchain that facilitates the buying, selling, and reviewing of real estate properties. This smart contract, written in Solidity, powers the core functionality of the SlvfxProp platform.
 
 ## Features
 
@@ -12,7 +12,7 @@ HemProp is a decentralized application (dApp) built on the Ethereum blockchain t
 
 ## Smart Contract Overview
 
-The `HemProp` contract inherits from OpenZeppelin's `ERC721`, `Ownable`, and `ReentrancyGuard` contracts, providing standard NFT functionality, ownership controls, and protection against reentrancy attacks.
+The `SlvfxProp` contract inherits from OpenZeppelin's `ERC721`, `Ownable`, and `ReentrancyGuard` contracts, providing standard NFT functionality, ownership controls, and protection against reentrancy attacks.
 
 ### Key Structures
 
@@ -38,7 +38,7 @@ The `HemProp` contract inherits from OpenZeppelin's `ERC721`, `Ownable`, and `Re
 
 ## Getting Started
 
-To interact with the HemProp contract, you'll need:
+To interact with the SlvfxProp contract, you'll need:
 
 1. An Ethereum wallet (e.g., MetaMask)
 2. Some ETH for gas fees and property purchases
@@ -62,9 +62,6 @@ The contract includes several security measures:
 - Access control checks for property and review management
 - Input validation for all user-provided data
 
-## License
-
-This project is licensed under the MIT License.
 
 ## Contributing
 
