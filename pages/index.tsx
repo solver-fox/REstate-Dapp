@@ -23,15 +23,15 @@ const HomePage: NextPage = () => {
         <title>SlvfxProp | Web3 Real Estate Marketplace</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      
+
       <main className="w-full mx-auto py-8">
         <Hero />
         <div className="px-4 sm:px-6 justify-center items-center lg:px-8 max-w-[1440px] mx-auto">
           <div className="max-w-3xl mx-auto text-center pt-32">
             <h1 className="text-4xl font-bold text-white mb-4">Discover Your Perfect Property</h1>
             <p className="text-gray-400 text-lg leading-relaxed">
-              Explore our curated collection of premium properties. Whether you&apos;re looking for a
-              cozy apartment, a spacious family home, or a luxury estate.
+              Explore our curated collection of premium properties. Whether you&apos;re looking for
+              a cozy apartment, a spacious family home, or a luxury estate.
             </p>
           </div>
 

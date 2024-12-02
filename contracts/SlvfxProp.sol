@@ -20,7 +20,7 @@ contract SlvfxProp is Ownable, ERC721, ReentrancyGuard {
   event ReviewUpdated(uint256 indexed propertyId, uint256 indexed reviewId);
   event ReviewDeleted(uint256 indexed propertyId, uint256 indexed reviewId);
 
-  constructor(uint256 _pct) ERC721('HemProperty', 'Hpt') {
+  constructor(uint256 _pct) ERC721('SfxProperty', 'Hpt') {
     servicePct = _pct;
   }
 

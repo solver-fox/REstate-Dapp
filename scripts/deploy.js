@@ -9,7 +9,7 @@ async function main() {
     console.log('Account balance:', (await ethers.provider.getBalance(deployer.address)).toString())
 
     const SlvfxProp = await ethers.getContractFactory('SlvfxProp')
-    console.log('Deploying Hemprop')
+    console.log('Deploying Sfxprop')
     const slvfxprop = await SlvfxProp.deploy(5)
     await slvfxprop.waitForDeployment()
 
